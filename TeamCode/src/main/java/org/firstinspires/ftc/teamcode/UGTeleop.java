@@ -91,14 +91,14 @@ public class UGTeleop extends LinearOpMode {
             //float unshoot = gamepad2.left_trigger;
 
             boolean shootTriggered = gamepad2.right_bumper;
-            boolean unshootTriggered = gamepad2.left_bumper;
+            //boolean unshootTriggered = gamepad2.left_bumper;
 
             if (shootTriggered) {
                 robot.shoot(true);
 
-            } else if (unshootTriggered) {
-                robot.setShooter(UGRobot.shooterDirection.IN);
-            } else {
+            } //else if (unshootTriggered) {
+               // robot.setShooter(UGRobot.shooterDirection.IN);
+             else {
                 robot.setShooter(UGRobot.shooterDirection.IDLE);
             }
 

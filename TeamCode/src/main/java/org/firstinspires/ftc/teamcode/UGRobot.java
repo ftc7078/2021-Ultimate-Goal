@@ -100,7 +100,7 @@ public class UGRobot {
                 shooter.setPower(0);
                 break;
             case IDLE:
-                shooter.setPower(0.5);
+                shooter.setPower(0.52);
                 break;
         }
     }
