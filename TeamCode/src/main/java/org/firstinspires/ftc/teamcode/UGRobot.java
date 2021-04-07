@@ -25,6 +25,8 @@ public class UGRobot {
     private Servo launchServo;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
+    private double idle = 0.52;
+    private double shoot = 0.6;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {IN, OUT, STOP, IDLE}
@@ -87,6 +89,23 @@ public class UGRobot {
             launchServo.setPosition(1);
         }
     }
+
+    public double getIdle() {
+        return idle;
+    }
+
+    public void setIdle(double idle) {
+        this.idle = idle;
+    }
+
+    public double getShoot() {
+        return shoot;
+    }
+
+    public void setShoot(double shoot) {
+        this.shoot = shoot;
+    }
+
     public void setShooter(UGRobot.shooterDirection direction) {
         shooterState = direction;
         switch (direction) {
@@ -94,13 +113,13 @@ public class UGRobot {
                 shooter.setPower(-1);
                 break;
             case OUT:
-                shooter.setPower(.6);
+                shooter.setPower(shoot);
                 break;
             case STOP:
                 shooter.setPower(0);
                 break;
             case IDLE:
-                shooter.setPower(0.52);
+                shooter.setPower(idle);
                 break;
         }
     }
