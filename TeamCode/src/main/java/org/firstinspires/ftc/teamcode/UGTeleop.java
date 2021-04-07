@@ -108,6 +108,7 @@ public class UGTeleop extends LinearOpMode {
             if (gamepad2.dpad_up != isSpeedUpPressed) {
                 if (gamepad2.dpad_up) {
                     robot.setShoot(robot.getShoot()+0.02);
+
                 }
                 isSpeedUpPressed = gamepad2.dpad_up;
             }
@@ -115,6 +116,7 @@ public class UGTeleop extends LinearOpMode {
             if (gamepad2.dpad_down != isSpeedDownPressed) {
                 if (gamepad2.dpad_down) {
                     robot.setShoot(robot.getShoot()-0.02);
+
                 }
                 isSpeedDownPressed = gamepad2.dpad_down;
             }
@@ -123,7 +125,7 @@ public class UGTeleop extends LinearOpMode {
 
             mecanumDrive.tickSleep();
             telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
-
+            telemetry.addData("Shoot Power", robot.getShoot());
             telemetry.update();
         }
 
