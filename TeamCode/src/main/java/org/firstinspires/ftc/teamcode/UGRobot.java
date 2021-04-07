@@ -26,7 +26,7 @@ public class UGRobot {
     public pickupDirection pickupState;
     public shooterDirection shooterState;
     private double idle = 0.52;
-    private double shoot = 0.6;
+    private double shoot = 0.52;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {IN, OUT, STOP, IDLE}
