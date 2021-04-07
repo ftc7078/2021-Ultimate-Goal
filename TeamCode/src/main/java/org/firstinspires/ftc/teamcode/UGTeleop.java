@@ -14,7 +14,8 @@ public class UGTeleop extends LinearOpMode {
 
 
     private ElapsedTime runtime = new ElapsedTime();
-
+    private boolean isSpeedUpPressed = false;
+    private boolean isSpeedDownPressed = false;
     /*
     private DcMotor rightManipulator = null;
     //private DcMotor leftManipulator = null;
@@ -102,9 +103,21 @@ public class UGTeleop extends LinearOpMode {
                 robot.setShooter(UGRobot.shooterDirection.IDLE);
             }
 
+             boolean speedUp = gamepad2.dpad_up;
+            boolean speedDown = gamepad2.dpad_down;
+            if (gamepad2.dpad_up != isSpeedUpPressed) {
+                if (gamepad2.dpad_up) {
+                    robot.setShoot(robot.getShoot()+0.02);
+                }
+                isSpeedUpPressed = gamepad2.dpad_up;
+            }
 
-
-
+            if (gamepad2.dpad_down != isSpeedDownPressed) {
+                if (gamepad2.dpad_down) {
+                    robot.setShoot(robot.getShoot()-0.02);
+                }
+                isSpeedDownPressed = gamepad2.dpad_down;
+            }
 
 
 
