@@ -16,22 +16,6 @@ public class UGTeleop extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private boolean isSpeedUpPressed = false;
     private boolean isSpeedDownPressed = false;
-    /*
-    private DcMotor rightManipulator = null;
-    //private DcMotor leftManipulator = null;
-    private final int FL=0;
-    private final int FR=1;
-    private final int BL =2;
-    private final int BR =3;
-    private final double SLOW=0.4;
-    private final double MAX_SPEED=2800;
-    Servo capstone;
-    Servo foundationRight;
-    Servo foundationLeft;
-    double capstonePosition=0;
-    private double mSpeed=1.0;
-
-     */
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
     private UGRobot robot = new UGRobot();
@@ -88,6 +72,7 @@ public class UGTeleop extends LinearOpMode {
                 telemetry.addData("Manipulator Motors", "Idle");
                 robot.setPickup(UGRobot.pickupDirection.STOP);
             }
+            telemetry.addData("Shooter Speed",robot.findShooterSpeed());
             //float shoot = gamepad2.right_trigger;
             //float unshoot = gamepad2.left_trigger;
 
