@@ -21,7 +21,7 @@ public class UGRobot {
     private DcMotor pickupbottom = null;
     private DcMotor pickuptop = null;
     private DcMotor pickup = null;
-    private DcMotor shooter = null;
+    private HPMC shooter = null;
     private Servo launchServo;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
@@ -41,7 +41,7 @@ public class UGRobot {
 
         pickupbottom = hardwareMap.get(DcMotor.class, "em1");
         pickuptop = hardwareMap.get(DcMotor.class, "em2");
-        shooter = hardwareMap.get(DcMotor.class,"em0");
+        shooter = new HPMC(hardwareMap,"em0",3000);
 
         pickupbottom.setPower(0);
         pickuptop.setPower(0);
@@ -63,6 +63,11 @@ public class UGRobot {
             setShooter(shooterDirection.IDLE);
         }
 
+    }
+
+    public double findShooterSpeed () {
+        shooter.updateCurrentVelocity();
+        return (shooter.getCurrentVelocity());
     }
 
     public void setPickup(UGRobot.pickupDirection direction) {
@@ -110,16 +115,16 @@ public class UGRobot {
         shooterState = direction;
         switch (direction) {
             case IN:
-                shooter.setPower(-1);
+                shooter.setPowerManual(-1);
                 break;
             case OUT:
-                shooter.setPower(shoot);
+                shooter.setPowerManual(shoot);
                 break;
             case STOP:
-                shooter.setPower(0);
+                shooter.setPowerManual(0);
                 break;
             case IDLE:
-                shooter.setPower(idle);
+                shooter.setPowerManual(idle);
                 break;
         }
     }
