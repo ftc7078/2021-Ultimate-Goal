@@ -25,8 +25,8 @@ public class UGRobot {
     private Servo launchServo;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
-    private double idle = 0.52;
-    private double shoot = 0.52;
+    private double idle = 0.54;
+    private double shoot = 0.54;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {IN, OUT, STOP, IDLE}
