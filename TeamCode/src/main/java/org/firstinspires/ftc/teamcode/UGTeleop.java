@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -24,12 +23,6 @@ public class UGTeleop extends LinearOpMode {
     public void runOpMode() {
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap,telemetry,this);
-
-
-        //capstone = hardwareMap.get(Servo.class, "capstone");
-        //foundationRight = hardwareMap.get(Servo.class, "foundationRight");
-        //foundationLeft = hardwareMap.get(Servo.class, "foundationLeft");
-
 
 
         // Tell the driver that initialization is complete.
@@ -72,19 +65,14 @@ public class UGTeleop extends LinearOpMode {
                 telemetry.addData("Manipulator Motors", "Idle");
                 robot.setPickup(UGRobot.pickupDirection.STOP);
             }
-            telemetry.addData("Shooter Speed",robot.findShooterSpeed());
-            //float shoot = gamepad2.right_trigger;
-            //float unshoot = gamepad2.left_trigger;
+
 
             boolean shootTriggered = gamepad2.right_bumper;
-            //boolean unshootTriggered = gamepad2.left_bumper;
 
             if (shootTriggered) {
                 robot.shoot(true);
 
-            } //else if (unshootTriggered) {
-               // robot.setShooter(UGRobot.shooterDirection.IN);
-             else {
+            } else {
                 robot.setShooter(UGRobot.shooterDirection.IDLE);
             }
 
@@ -92,8 +80,8 @@ public class UGTeleop extends LinearOpMode {
             boolean speedDown = gamepad2.dpad_down;
             if (gamepad2.dpad_up != isSpeedUpPressed) {
                 if (gamepad2.dpad_up) {
-                    robot.setShoot(robot.getShoot()+0.02);
-                    robot.setIdle(robot.getShoot()+0.02);
+                    robot.setShooterPower(robot.getShooterPower()+0.02);
+                    robot.setIdle(robot.getShooterPower()+0.02);
                     robot.setShooter(UGRobot.shooterDirection.IDLE);
                 }
                 isSpeedUpPressed = gamepad2.dpad_up;
@@ -101,18 +89,19 @@ public class UGTeleop extends LinearOpMode {
 
             if (gamepad2.dpad_down != isSpeedDownPressed) {
                 if (gamepad2.dpad_down) {
-                    robot.setShoot(robot.getShoot()-0.02);
-                    robot.setIdle(robot.getShoot()-0.02);
+                    robot.setShooterPower(robot.getShooterPower()-0.02);
+                    robot.setIdle(robot.getShooterPower()-0.02);
                     robot.setShooter(UGRobot.shooterDirection.IDLE);
                 }
                 isSpeedDownPressed = gamepad2.dpad_down;
             }
 
-
-
             mecanumDrive.tickSleep();
             telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
-            telemetry.addData("Shoot Power", robot.getShoot());
+            telemetry.addData("Shoot Power", robot.getShooterPower());
+            telemetry.addData("Shooter Speed",robot.findShooterSpeed());
+            telemetry.addData("Encoder Position",robot.getShooterEncoderPosition());
+
             telemetry.update();
         }
 
