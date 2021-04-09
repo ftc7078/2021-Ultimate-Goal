@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -14,7 +13,6 @@ public class UGRobot {
 
     private Telemetry telemetry;
     private LinearOpMode opMode;
-
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
 
@@ -26,7 +24,7 @@ public class UGRobot {
     public pickupDirection pickupState;
     public shooterDirection shooterState;
     private double idle = 0.61;
-    private double shoot = 0.61;
+    private double shooterPower = 0.61;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {IN, OUT, STOP, IDLE}
@@ -103,12 +101,16 @@ public class UGRobot {
         this.idle = idle;
     }
 
-    public double getShoot() {
-        return shoot;
+    public double getShooterPower() {
+        return shooterPower;
     }
 
-    public void setShoot(double shoot) {
-        this.shoot = shoot;
+    public void setShooterPower(double shooterPower) {
+        this.shooterPower = shooterPower;
+    }
+
+    public int getShooterEncoderPosition() {
+        return shooter.motor.getCurrentPosition();
     }
 
     public void setShooter(UGRobot.shooterDirection direction) {
@@ -118,7 +120,7 @@ public class UGRobot {
                 shooter.setPowerManual(-1);
                 break;
             case OUT:
-                shooter.setPowerManual(shoot);
+                shooter.setPowerManual(shooterPower);
                 break;
             case STOP:
                 shooter.setPowerManual(0);
