@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -14,23 +13,8 @@ public class UGTeleop extends LinearOpMode {
 
 
     private ElapsedTime runtime = new ElapsedTime();
-
-    /*
-    private DcMotor rightManipulator = null;
-    //private DcMotor leftManipulator = null;
-    private final int FL=0;
-    private final int FR=1;
-    private final int BL =2;
-    private final int BR =3;
-    private final double SLOW=0.4;
-    private final double MAX_SPEED=2800;
-    Servo capstone;
-    Servo foundationRight;
-    Servo foundationLeft;
-    double capstonePosition=0;
-    private double mSpeed=1.0;
-
-     */
+    private boolean isSpeedUpPressed = false;
+    private boolean isSpeedDownPressed = false;
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
     private UGRobot robot = new UGRobot();
@@ -39,12 +23,6 @@ public class UGTeleop extends LinearOpMode {
     public void runOpMode() {
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap,telemetry,this);
-
-
-        //capstone = hardwareMap.get(Servo.class, "capstone");
-        //foundationRight = hardwareMap.get(Servo.class, "foundationRight");
-        //foundationLeft = hardwareMap.get(Servo.class, "foundationLeft");
-
 
 
         // Tell the driver that initialization is complete.
@@ -87,29 +65,42 @@ public class UGTeleop extends LinearOpMode {
                 telemetry.addData("Manipulator Motors", "Idle");
                 robot.setPickup(UGRobot.pickupDirection.STOP);
             }
-            //float shoot = gamepad2.right_trigger;
-            //float unshoot = gamepad2.left_trigger;
+
 
             boolean shootTriggered = gamepad2.right_bumper;
-            boolean unshootTriggered = gamepad2.left_bumper;
 
             if (shootTriggered) {
                 robot.shoot(true);
 
-            } else if (unshootTriggered) {
-                robot.setShooter(UGRobot.shooterDirection.IN);
             } else {
                 robot.setShooter(UGRobot.shooterDirection.IDLE);
             }
 
+             boolean speedUp = gamepad2.dpad_up;
+            boolean speedDown = gamepad2.dpad_down;
+            if (gamepad2.dpad_up != isSpeedUpPressed) {
+                if (gamepad2.dpad_up) {
+                    robot.setShooterPower(robot.getShooterPower()+0.02);
+                    robot.setIdle(robot.getShooterPower()+0.02);
+                    robot.setShooter(UGRobot.shooterDirection.IDLE);
+                }
+                isSpeedUpPressed = gamepad2.dpad_up;
+            }
 
-
-
-
-
+            if (gamepad2.dpad_down != isSpeedDownPressed) {
+                if (gamepad2.dpad_down) {
+                    robot.setShooterPower(robot.getShooterPower()-0.02);
+                    robot.setIdle(robot.getShooterPower()-0.02);
+                    robot.setShooter(UGRobot.shooterDirection.IDLE);
+                }
+                isSpeedDownPressed = gamepad2.dpad_down;
+            }
 
             mecanumDrive.tickSleep();
             telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
+            telemetry.addData("Shoot Power", robot.getShooterPower());
+            telemetry.addData("Shooter Speed",robot.findShooterSpeed());
+            telemetry.addData("Encoder Position",robot.getShooterEncoderPosition());
 
             telemetry.update();
         }
