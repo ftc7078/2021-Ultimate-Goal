@@ -52,7 +52,6 @@ public class UGRobot {
     public void shoot (boolean out) {
         if (out) {
             setShooter(UGRobot.shooterDirection.OUT);
-            opMode.sleep(500);
             setLaunchServo(true);
             opMode.sleep(300);
             setLaunchServo(false);
