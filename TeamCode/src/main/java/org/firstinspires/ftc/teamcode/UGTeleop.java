@@ -70,6 +70,7 @@ public class UGTeleop extends LinearOpMode {
             boolean shootTriggered = gamepad2.right_bumper;
 
             if (shootTriggered) {
+                mecanumDrive.setMotors(0,0,0, 1);
                 robot.shoot(true);
 
             } else {
