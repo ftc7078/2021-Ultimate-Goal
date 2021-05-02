@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -30,7 +29,7 @@ public class UGRobot {
     public shooterDirection shooterState;
     private double idle = 0.61;
     private double shooterPower = 0.61;
-    private ArrayList<Long> toggleArray = new ArrayList<Long>();
+    private ArrayList<Long> toggleQueue = new ArrayList<Long>();
     private boolean launchServoState;
 
     enum pickupDirection {IN, OUT, STOP}
@@ -62,21 +61,29 @@ public class UGRobot {
 
     public void tick () {
         long now = System.nanoTime();
-        for (Long when : toggleArray) {
+        for (Long when : toggleQueue) {
             if (now>when){
                 setLaunchServo(!launchServoState);
-                toggleArray.remove(when);
+                toggleQueue.remove(when);
             }
         }
+    }
+
+    public void clearQueue (){
+        toggleQueue.clear();
+    }
+
+    public void addQueue (int whenMS) {
+        toggleQueue.add(System.nanoTime()+(whenMS*1000000));
     }
 
     public void shoot (boolean out) {
         if (out) {
             setShooter(UGRobot.shooterDirection.OUT);
             setLaunchServo(true);
-            opMode.sleep(300);
+            addQueue(300);
             setLaunchServo(false);
-            opMode.sleep(700);
+            addQueue(700);
         } else {
             setShooter(shooterDirection.IDLE);
         }
