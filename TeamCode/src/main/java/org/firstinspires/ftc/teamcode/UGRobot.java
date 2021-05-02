@@ -61,11 +61,15 @@ public class UGRobot {
 
     public void tick () {
         long now = System.nanoTime();
+        Long entry = null;
         for (Long when : toggleQueue) {
             if (now>when){
-                setLaunchServo(!launchServoState);
-                toggleQueue.remove(when);
+                entry = when;
             }
+        }
+        if (entry != null) {
+            setLaunchServo(!launchServoState);
+            toggleQueue.remove(entry);
         }
     }
 
