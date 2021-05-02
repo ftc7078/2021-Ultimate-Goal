@@ -15,6 +15,7 @@ public class UGTeleop extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private boolean isSpeedUpPressed = false;
     private boolean isSpeedDownPressed = false;
+    private boolean isShootTriggered = false;
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
     private UGRobot robot = new UGRobot();
@@ -69,12 +70,12 @@ public class UGTeleop extends LinearOpMode {
 
             boolean shootTriggered = gamepad2.right_bumper;
 
-            if (shootTriggered) {
+            if (gamepad2.right_bumper != isShootTriggered) {
                 //mecanumDrive.setMotors(0,0,0, 1);
-                robot.shoot(true);
-
-            } else {
-                robot.setShooter(UGRobot.shooterDirection.IDLE);
+                if (gamepad2.right_bumper) {
+                    robot.shoot();
+                }
+                isShootTriggered = gamepad2.right_bumper;
             }
 
              boolean speedUp = gamepad2.dpad_up;

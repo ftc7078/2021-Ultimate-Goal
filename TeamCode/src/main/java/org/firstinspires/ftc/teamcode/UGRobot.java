@@ -81,16 +81,11 @@ public class UGRobot {
         toggleQueue.add(System.nanoTime()+(whenMS*1000000));
     }
 
-    public void shoot (boolean out) {
-        if (out) {
+    public void shoot () {
             clearQueue();
             setShooter(UGRobot.shooterDirection.OUT);
             setLaunchServo(true);
             addQueue(300);
-        } else {
-            setShooter(shooterDirection.IDLE);
-        }
-
     }
 
     public double findShooterSpeed () {
