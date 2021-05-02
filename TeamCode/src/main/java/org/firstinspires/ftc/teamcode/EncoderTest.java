@@ -23,6 +23,7 @@ public class EncoderTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         shooter = new HPMC(hardwareMap, "shooter", 2800);
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
          telemetry.addData("Status", "Initialized");
          waitForStart();
          runtime.reset();
