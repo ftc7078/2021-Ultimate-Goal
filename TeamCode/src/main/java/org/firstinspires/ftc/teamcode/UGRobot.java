@@ -87,8 +87,6 @@ public class UGRobot {
             setShooter(UGRobot.shooterDirection.OUT);
             setLaunchServo(true);
             addQueue(300);
-            setLaunchServo(false);
-            addQueue(1000);
         } else {
             setShooter(shooterDirection.IDLE);
         }
