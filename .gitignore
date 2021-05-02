@@ -85,6 +85,8 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
-.idea/misc.xml
 .idea/compiler.xml
 .idea/jarRepositories.xml
+.idea/misc.xml
+build.gradle
+gradle/wrapper/gradle-wrapper.properties
