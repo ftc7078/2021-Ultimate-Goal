@@ -79,6 +79,7 @@ public class UGRobot {
 
     public void shoot (boolean out) {
         if (out) {
+            clearQueue();
             setShooter(UGRobot.shooterDirection.OUT);
             setLaunchServo(true);
             addQueue(300);
