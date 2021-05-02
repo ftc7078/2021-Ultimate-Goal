@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -19,8 +20,10 @@ public class UGRobot {
     private DcMotor pickupbottom = null;
     private DcMotor pickuptop = null;
     private DcMotor pickup = null;
-    private HPMC shooter = null;
+    private HPMC flyWheel = null;
+    private HPMC wobbleArmMotor = null;
     private Servo launchServo;
+    private Servo gripper;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
     private double idle = 0.61;
@@ -35,11 +38,15 @@ public class UGRobot {
         telemetry = telemetryIn;
         opMode = opModeIn;
 
-        launchServo = hardwareMap.get(Servo.class,"servo");
+        launchServo = hardwareMap.get(Servo.class,"launchServo");
+        gripper = hardwareMap.get(Servo.class,"gripper");
 
-        pickupbottom = hardwareMap.get(DcMotor.class, "em1");
-        pickuptop = hardwareMap.get(DcMotor.class, "em2");
-        shooter = new HPMC(hardwareMap,"em0",3000);
+        pickupbottom = hardwareMap.get(DcMotor.class, "pickupBottom");
+        pickuptop = hardwareMap.get(DcMotor.class, "pickupTop");
+        wobbleArmMotor = new HPMC(hardwareMap, "wobble", 3000);
+        flyWheel = new HPMC(hardwareMap,"shooter",3000);
+
+        flyWheel.setDirection(DcMotor.Direction.REVERSE);
 
         pickupbottom.setPower(0);
         pickuptop.setPower(0);
@@ -63,8 +70,8 @@ public class UGRobot {
     }
 
     public double findShooterSpeed () {
-        shooter.updateCurrentVelocity();
-        return (shooter.getCurrentVelocity());
+        flyWheel.updateCurrentVelocity();
+        return (flyWheel.getCurrentVelocity());
     }
 
     public void setPickup(UGRobot.pickupDirection direction) {
@@ -109,23 +116,23 @@ public class UGRobot {
     }
 
     public int getShooterEncoderPosition() {
-        return shooter.motor.getCurrentPosition();
+        return flyWheel.motor.getCurrentPosition();
     }
 
     public void setShooter(UGRobot.shooterDirection direction) {
         shooterState = direction;
         switch (direction) {
             case IN:
-                shooter.setPowerManual(-1);
+                flyWheel.setPowerManual(-1);
                 break;
             case OUT:
-                shooter.setPowerManual(shooterPower);
+                flyWheel.setPowerManual(shooterPower);
                 break;
             case STOP:
-                shooter.setPowerManual(0);
+                flyWheel.setPowerManual(0);
                 break;
             case IDLE:
-                shooter.setPowerManual(idle);
+                flyWheel.setPowerManual(idle);
                 break;
         }
     }
