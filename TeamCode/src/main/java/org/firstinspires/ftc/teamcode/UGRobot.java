@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.ArrayList;
+
 public class UGRobot {
 
     private Telemetry telemetry;
@@ -28,6 +30,8 @@ public class UGRobot {
     public shooterDirection shooterState;
     private double idle = 0.61;
     private double shooterPower = 0.61;
+    private ArrayList<Long> toggleArray = new ArrayList<Long>();
+    private boolean launchServoState;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {IN, OUT, STOP, IDLE}
@@ -54,6 +58,16 @@ public class UGRobot {
         setLaunchServo(false);
 
 
+    }
+
+    public void tick () {
+        long now = System.nanoTime();
+        for (Long when : toggleArray) {
+            if (now>when){
+                setLaunchServo(!launchServoState);
+                toggleArray.remove(when);
+            }
+        }
     }
 
     public void shoot (boolean out) {
@@ -94,8 +108,10 @@ public class UGRobot {
     public void setLaunchServo (boolean in) {
         if(in) {
             launchServo.setPosition(0);
+            launchServoState = true;
         } else {
             launchServo.setPosition(1);
+            launchServoState = false;
         }
     }
 
