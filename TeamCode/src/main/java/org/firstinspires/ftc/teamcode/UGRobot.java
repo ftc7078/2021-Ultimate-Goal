@@ -113,6 +113,22 @@ public class UGRobot {
         }
     }
 
+    public void multiShoot (){
+        clearQueue();
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(200);
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(400);
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(600);
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(800);
+    }
+
     public void clearQueue (){
         toggleQueue.clear();
     }
