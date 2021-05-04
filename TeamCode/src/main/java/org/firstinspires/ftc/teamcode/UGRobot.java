@@ -105,6 +105,14 @@ public class UGRobot {
         }
     }
 
+    public void wobbleServo (boolean close){
+        if (close){
+            gripper.setPosition(1);
+        } else {
+            gripper.setPosition(0);
+        }
+    }
+
     public void clearQueue (){
         toggleQueue.clear();
     }
