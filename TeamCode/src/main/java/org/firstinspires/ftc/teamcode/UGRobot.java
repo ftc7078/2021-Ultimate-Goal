@@ -93,10 +93,15 @@ public class UGRobot {
         if (targetPosition == wobblePosition.UP){
             wobbleArmMotor.setTargetPosition(upWobble);
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(.5);
         } else if (targetPosition == wobblePosition.DOWN) {
             wobbleArmMotor.setTargetPosition(downWobble);
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(.5);
         } else if (targetPosition == wobblePosition.MID){
             wobbleArmMotor.setTargetPosition(midWobble);
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(.5);
         }
     }
 
