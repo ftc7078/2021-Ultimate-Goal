@@ -15,6 +15,11 @@ public class UGTeleop extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private boolean isSpeedUpPressed = false;
     private boolean isSpeedDownPressed = false;
+    private boolean isShootTriggered = false;
+    private boolean isWobbleUpTriggered = false;
+    private boolean isWobbleDownTriggered = false;
+    private boolean isWobbleOpenTriggered = false;
+    private boolean isWobbleCloseTriggered = false;
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
     private UGRobot robot = new UGRobot();
@@ -66,42 +71,70 @@ public class UGTeleop extends LinearOpMode {
                 robot.setPickup(UGRobot.pickupDirection.STOP);
             }
 
-
-            boolean shootTriggered = gamepad2.right_bumper;
-
-            if (shootTriggered) {
-                mecanumDrive.setMotors(0,0,0, 1);
-                robot.shoot(true);
-
-            } else {
-                robot.setShooter(UGRobot.shooterDirection.IDLE);
+            if (gamepad2.right_bumper != isShootTriggered) {
+                //mecanumDrive.setMotors(0,0,0, 1);
+                if (gamepad2.right_bumper) {
+                    robot.shoot();
+                }
+                isShootTriggered = gamepad2.right_bumper;
             }
 
-             boolean speedUp = gamepad2.dpad_up;
-            boolean speedDown = gamepad2.dpad_down;
-            if (gamepad2.dpad_up != isSpeedUpPressed) {
-                if (gamepad2.dpad_up) {
-                    robot.setShooterPower(robot.getShooterPower()+0.02);
-                    robot.setIdle(robot.getShooterPower()+0.02);
-                    robot.setShooter(UGRobot.shooterDirection.IDLE);
+            if (gamepad2.start != isSpeedUpPressed) {
+                if (gamepad2.start) {
+                    robot.setFlywheelPower(robot.getFlywheelPower()+0.02);
+                    robot.setIdle(robot.getFlywheelPower()+0.02);
+                    robot.setFlywheel(UGRobot.shooterDirection.OUT);
                 }
-                isSpeedUpPressed = gamepad2.dpad_up;
+                isSpeedUpPressed = gamepad2.start;
             }
 
-            if (gamepad2.dpad_down != isSpeedDownPressed) {
-                if (gamepad2.dpad_down) {
-                    robot.setShooterPower(robot.getShooterPower()-0.02);
-                    robot.setIdle(robot.getShooterPower()-0.02);
-                    robot.setShooter(UGRobot.shooterDirection.IDLE);
+            if (gamepad2.back != isSpeedDownPressed) {
+                if (gamepad2.back) {
+                    robot.setFlywheelPower(robot.getFlywheelPower()-0.02);
+                    robot.setIdle(robot.getFlywheelPower()-0.02);
+                    robot.setFlywheel(UGRobot.shooterDirection.OUT);
                 }
-                isSpeedDownPressed = gamepad2.dpad_down;
+                isSpeedDownPressed = gamepad2.back;
+            }
+
+            if (gamepad2.dpad_up != isWobbleUpTriggered){
+                if (gamepad2.dpad_up){
+                    robot.moveWobbleArm(UGRobot.wobblePosition.UP);
+                }
+                isWobbleUpTriggered = gamepad2.dpad_up;
+            }
+
+            if (gamepad2.dpad_down != isWobbleDownTriggered){
+                if (gamepad2.dpad_down){
+                    robot.moveWobbleArm(UGRobot.wobblePosition.MID);
+                }
+                isWobbleDownTriggered = gamepad2.dpad_down;
+            }
+
+            if (gamepad2.dpad_left != isWobbleCloseTriggered){
+                if (gamepad2.dpad_left){
+                    robot.wobbleServo(true);
+                }
+                isWobbleCloseTriggered = gamepad2.dpad_left;
+            }
+
+            if (gamepad2.dpad_right != isWobbleOpenTriggered){
+                if (gamepad2.dpad_right){
+                    robot.wobbleServo(false);
+                }
+                isWobbleOpenTriggered = gamepad2.dpad_right;
             }
 
             mecanumDrive.tickSleep();
-            telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
-            telemetry.addData("Shoot Power", robot.getShooterPower());
-            telemetry.addData("Shooter Speed",robot.findShooterSpeed());
-            telemetry.addData("Encoder Position",robot.getShooterEncoderPosition());
+            robot.tick();
+            //telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
+            telemetry.addData("Shoot Power", robot.getFlywheelPower());
+
+            telemetry.addData("Current Velocity",robot.flyWheel.getCurrentVelocity());
+            telemetry.addData("Desired Velocity", robot.flyWheel.getDesiredVelocity());
+            telemetry.addData("MotorPower",robot.flyWheel.motor.getPower());
+            telemetry.addData("change",robot.flyWheel.change);
+            telemetry.addData("vs",robot.flyWheel.difference);
 
             telemetry.update();
         }

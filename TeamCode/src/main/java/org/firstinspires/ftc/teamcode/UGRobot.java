@@ -4,10 +4,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import java.util.ArrayList;
 
 public class UGRobot {
 
@@ -19,15 +22,24 @@ public class UGRobot {
     private DcMotor pickupbottom = null;
     private DcMotor pickuptop = null;
     private DcMotor pickup = null;
-    private HPMC shooter = null;
+    FlywheelMC flyWheel = null;
+    private DcMotor wobbleArmMotor = null;
     private Servo launchServo;
+    private Servo gripper;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
     private double idle = 0.61;
-    private double shooterPower = 0.61;
+    private double flywheelPower = 0.61;
+    private int upWobble = 1000;
+    private int downWobble = 0;
+    private int midWobble = 500;
+    private int lastPosition = 0;
+    private ArrayList<Long> toggleQueue = new ArrayList<Long>();
+    private boolean launchServoState;
 
     enum pickupDirection {IN, OUT, STOP}
-    enum shooterDirection {IN, OUT, STOP, IDLE}
+    enum shooterDirection {OUT, STOP}
+    enum wobblePosition {UP,DOWN,MID}
 
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
@@ -35,37 +47,123 @@ public class UGRobot {
         telemetry = telemetryIn;
         opMode = opModeIn;
 
-        launchServo = hardwareMap.get(Servo.class,"servo");
+        launchServo = hardwareMap.get(Servo.class,"launchServo");
+        gripper = hardwareMap.get(Servo.class,"gripper");
 
-        pickupbottom = hardwareMap.get(DcMotor.class, "em1");
-        pickuptop = hardwareMap.get(DcMotor.class, "em2");
-        shooter = new HPMC(hardwareMap,"em0",3000);
+        pickupbottom = hardwareMap.get(DcMotor.class, "pickupBottom");
+        pickuptop = hardwareMap.get(DcMotor.class, "pickupTop");
+        wobbleArmMotor = hardwareMap.get(DcMotor.class,"wobble");
+        wobbleArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wobbleArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flyWheel = new FlywheelMC(hardwareMap,"shooter",600000);
+
+        flyWheel.setDirection(DcMotor.Direction.REVERSE);
+        flyWheel.setBackwardsEncoder(true);
+
+        flyWheel.setHistorySize(3);
 
         pickupbottom.setPower(0);
         pickuptop.setPower(0);
-        setShooter(shooterDirection.IDLE);
+        setFlywheel(shooterDirection.OUT);
+        flyWheel.setPowerManual(flywheelPower);
+        flyWheel.setPowerScale(150/100000000.0);
+        flyWheel.setLookAheadTime(.35);
         setLaunchServo(false);
 
 
+        lastPosition = wobbleArmMotor.getCurrentPosition();
+        wobbleArmMotor.setPower(-.2);
+        opMode.sleep(50);
+        while (wobbleArmMotor.getCurrentPosition() < lastPosition && !opMode.isStarted()) {
+            lastPosition = wobbleArmMotor.getCurrentPosition();
+            opMode.sleep(50);
+        }
+        wobbleArmMotor.setPower(0);
+        wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    public void shoot (boolean out) {
-        if (out) {
-            setShooter(UGRobot.shooterDirection.OUT);
-            opMode.sleep(500);
-            setLaunchServo(true);
-            opMode.sleep(300);
-            setLaunchServo(false);
-            opMode.sleep(700);
-        } else {
-            setShooter(shooterDirection.IDLE);
+    public void tick () {
+        long now = System.nanoTime();
+        Long entry = null;
+        for (Long when : toggleQueue) {
+            if (now>when){
+                entry = when;
+            }
         }
+        if (entry != null) {
+            setLaunchServo(!launchServoState);
+            toggleQueue.remove(entry);
+        }
+        flyWheel.setPowerAuto(flywheelPower);
+    }
 
+    public void moveWobbleArm (wobblePosition targetPosition){
+        if (targetPosition == wobblePosition.UP){
+            wobbleArmMotor.setTargetPosition(upWobble);
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(.5);
+        } else if (targetPosition == wobblePosition.DOWN) {
+            wobbleArmMotor.setTargetPosition(downWobble);
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(.5);
+        } else if (targetPosition == wobblePosition.MID){
+            wobbleArmMotor.setTargetPosition(midWobble);
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(.5);
+        }
+    }
+
+    public void wobbleServo (boolean close){
+        if (close){
+            gripper.setPosition(1);
+        } else {
+            gripper.setPosition(0);
+        }
+    }
+
+    public void multiShoot (){
+        clearQueue();
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(200);
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(400);
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(600);
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(800);
+    }
+
+    public void clearQueue (){
+        toggleQueue.clear();
+    }
+
+    public void addQueue (int whenMS) {
+        toggleQueue.add(System.nanoTime()+(whenMS*1000000));
+    }
+
+    public void oldShoot() {
+        setLaunchServo(true);
+        opMode.sleep(200);
+        setLaunchServo(false);
+        opMode.sleep(200);
+
+    }
+
+    public void shoot () {
+        clearQueue();
+        setFlywheel(UGRobot.shooterDirection.OUT);
+        setLaunchServo(true);
+        addQueue(200);
     }
 
     public double findShooterSpeed () {
-        shooter.updateCurrentVelocity();
-        return (shooter.getCurrentVelocity());
+        flyWheel.updateCurrentVelocity();
+        return (flyWheel.getCurrentVelocity());
     }
 
     public void setPickup(UGRobot.pickupDirection direction) {
@@ -85,11 +183,14 @@ public class UGRobot {
                 break;
         }
     }
+
     public void setLaunchServo (boolean in) {
         if(in) {
             launchServo.setPosition(0);
+            launchServoState = true;
         } else {
-            launchServo.setPosition(1);
+            launchServo.setPosition(0.55);
+            launchServoState = false;
         }
     }
 
@@ -101,32 +202,26 @@ public class UGRobot {
         this.idle = idle;
     }
 
-    public double getShooterPower() {
-        return shooterPower;
+    public double getFlywheelPower() {
+        return flywheelPower;
     }
 
-    public void setShooterPower(double shooterPower) {
-        this.shooterPower = shooterPower;
+    public void setFlywheelPower(double flywheelPower) {
+        this.flywheelPower = flywheelPower;
     }
 
     public int getShooterEncoderPosition() {
-        return shooter.motor.getCurrentPosition();
+        return flyWheel.motor.getCurrentPosition();
     }
 
-    public void setShooter(UGRobot.shooterDirection direction) {
+    public void setFlywheel(UGRobot.shooterDirection direction) {
         shooterState = direction;
         switch (direction) {
-            case IN:
-                shooter.setPowerManual(-1);
-                break;
             case OUT:
-                shooter.setPowerManual(shooterPower);
+                flyWheel.setPowerAuto(flywheelPower);
                 break;
             case STOP:
-                shooter.setPowerManual(0);
-                break;
-            case IDLE:
-                shooter.setPowerManual(idle);
+                flyWheel.setPowerManual(0);
                 break;
         }
     }
