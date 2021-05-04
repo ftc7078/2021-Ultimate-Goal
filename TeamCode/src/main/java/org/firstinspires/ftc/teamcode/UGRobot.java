@@ -33,6 +33,7 @@ public class UGRobot {
     private int upWobble = 1000;
     private int downWobble = 0;
     private int midWobble = 500;
+    private int lastPosition = 0;
     private ArrayList<Long> toggleQueue = new ArrayList<Long>();
     private boolean launchServoState;
 
@@ -62,7 +63,6 @@ public class UGRobot {
 
         flyWheel.setHistorySize(3);
 
-
         pickupbottom.setPower(0);
         pickuptop.setPower(0);
         setFlywheel(shooterDirection.OUT);
@@ -72,6 +72,15 @@ public class UGRobot {
         setLaunchServo(false);
 
 
+            lastPosition = wobbleArmMotor.getCurrentPosition();
+            wobbleArmMotor.setPower(-.2);
+            opMode.sleep(50);
+            while (wobbleArmMotor.getCurrentPosition() < lastPosition && !opMode.isStarted()) {
+                lastPosition = wobbleArmMotor.getCurrentPosition();
+                opMode.sleep(50);
+            }
+            wobbleArmMotor.setPower(0);
+        wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void tick () {
