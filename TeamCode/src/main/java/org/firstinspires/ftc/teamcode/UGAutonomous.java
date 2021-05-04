@@ -80,10 +80,10 @@ public class UGAutonomous extends LinearOpMode {
 
             mecanumDrive.forward(60, 0.7);
             mecanumDrive.rightTurn(10, 0.2);
-            robot.shoot(true);
-            robot.shoot(true);
-            robot.shoot(true);
-            robot.shoot(true);
+            robot.oldShoot();
+            robot.oldShoot();
+            robot.oldShoot();
+            robot.oldShoot();
             if (ringsFound == UGObjectDetector.ringStackState.NONE) {
                 mecanumDrive.arcMove(0, 72, 0.3, RIGHT, true, true);
                 mecanumDrive.forward(31, 0.5);
