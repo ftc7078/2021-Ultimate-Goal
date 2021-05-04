@@ -4,9 +4,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -34,11 +32,13 @@ public class UGRobot {
     private double flywheelPower = 0.61;
     private int upWobble = 1000;
     private int downWobble = 0;
+    private int midWobble = 500;
     private ArrayList<Long> toggleQueue = new ArrayList<Long>();
     private boolean launchServoState;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {OUT, STOP}
+    enum wobblePosition {UP,DOWN,MID}
 
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
@@ -52,8 +52,8 @@ public class UGRobot {
         pickupbottom = hardwareMap.get(DcMotor.class, "pickupBottom");
         pickuptop = hardwareMap.get(DcMotor.class, "pickupTop");
         wobbleArmMotor = hardwareMap.get(DcMotor.class,"wobble");
+        wobbleArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         wobbleArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         flyWheel = new FlywheelMC(hardwareMap,"shooter",600000);
 
@@ -89,11 +89,14 @@ public class UGRobot {
         flyWheel.setPowerAuto(flywheelPower);
     }
 
-    public void moveWobbleArm (boolean up){
-        if (up){
+    public void moveWobbleArm (wobblePosition targetPosition){
+        if (targetPosition == wobblePosition.UP){
             wobbleArmMotor.setTargetPosition(upWobble);
-        } else {
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else if (targetPosition == wobblePosition.DOWN) {
             wobbleArmMotor.setTargetPosition(downWobble);
+        } else if (targetPosition == wobblePosition.MID){
+            wobbleArmMotor.setTargetPosition(midWobble);
         }
     }
 
