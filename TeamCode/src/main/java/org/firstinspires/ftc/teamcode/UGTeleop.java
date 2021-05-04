@@ -78,32 +78,36 @@ public class UGTeleop extends LinearOpMode {
                 isShootTriggered = gamepad2.right_bumper;
             }
 
-             boolean speedUp = gamepad2.dpad_up;
+            boolean speedUp = gamepad2.dpad_up;
             boolean speedDown = gamepad2.dpad_down;
             if (gamepad2.dpad_up != isSpeedUpPressed) {
                 if (gamepad2.dpad_up) {
-                    robot.setShooterPower(robot.getShooterPower()+0.02);
-                    robot.setIdle(robot.getShooterPower()+0.02);
-                    robot.setShooter(UGRobot.shooterDirection.IDLE);
+                    robot.setFlywheelPower(robot.getFlywheelPower()+0.02);
+                    robot.setIdle(robot.getFlywheelPower()+0.02);
+                    robot.setFlywheel(UGRobot.shooterDirection.OUT);
                 }
                 isSpeedUpPressed = gamepad2.dpad_up;
             }
 
             if (gamepad2.dpad_down != isSpeedDownPressed) {
                 if (gamepad2.dpad_down) {
-                    robot.setShooterPower(robot.getShooterPower()-0.02);
-                    robot.setIdle(robot.getShooterPower()-0.02);
-                    robot.setShooter(UGRobot.shooterDirection.IDLE);
+                    robot.setFlywheelPower(robot.getFlywheelPower()-0.02);
+                    robot.setIdle(robot.getFlywheelPower()-0.02);
+                    robot.setFlywheel(UGRobot.shooterDirection.OUT);
                 }
                 isSpeedDownPressed = gamepad2.dpad_down;
             }
 
             mecanumDrive.tickSleep();
             robot.tick();
-            telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
-            telemetry.addData("Shoot Power", robot.getShooterPower());
-            telemetry.addData("Shooter Speed",robot.findShooterSpeed());
-            telemetry.addData("Encoder Position",robot.getShooterEncoderPosition());
+            //telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
+            telemetry.addData("Shoot Power", robot.getFlywheelPower());
+
+            telemetry.addData("Current Velocity",robot.flyWheel.getCurrentVelocity());
+            telemetry.addData("Desired Velocity", robot.flyWheel.getDesiredVelocity());
+            telemetry.addData("MotorPower",robot.flyWheel.motor.getPower());
+            telemetry.addData("change",robot.flyWheel.change);
+            telemetry.addData("vs",robot.flyWheel.difference);
 
             telemetry.update();
         }
