@@ -220,7 +220,7 @@ public class FlywheelMC {
         difference =  desiredVelocity - velocitySoon;
         if ( Math.abs(desiredVelocity) < 1) {
             change = -power;
-        } else if ( (velocitySoon / desiredVelocity) > 1.1) {
+        } else if ( (velocitySoon / desiredVelocity) > 2.0 ) {
             change =  (power * (desiredVelocity / velocitySoon)) - power;
             //System.out.println(String.format("Change from overspeed: %.4f", change));
         } else {

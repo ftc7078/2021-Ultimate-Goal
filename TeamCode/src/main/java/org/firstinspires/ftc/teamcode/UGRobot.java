@@ -51,7 +51,7 @@ public class UGRobot {
 
         flyWheel.setDirection(DcMotor.Direction.REVERSE);
         flyWheel.setBackwardsEncoder(true);
-        flyWheel.setLookAheadTime(0.1);
+
         flyWheel.setHistorySize(3);
 
 
@@ -59,7 +59,8 @@ public class UGRobot {
         pickuptop.setPower(0);
         setFlywheel(shooterDirection.OUT);
         flyWheel.setPowerManual(flywheelPower);
-        flyWheel.setPowerScale(7.5/100000000.0);
+        flyWheel.setPowerScale(150/100000000.0);
+        flyWheel.setLookAheadTime(.35);
         setLaunchServo(false);
 
 
