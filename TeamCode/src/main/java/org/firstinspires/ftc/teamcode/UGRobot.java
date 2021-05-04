@@ -72,14 +72,14 @@ public class UGRobot {
         setLaunchServo(false);
 
 
+        lastPosition = wobbleArmMotor.getCurrentPosition();
+        wobbleArmMotor.setPower(-.2);
+        opMode.sleep(50);
+        while (wobbleArmMotor.getCurrentPosition() < lastPosition && !opMode.isStarted()) {
             lastPosition = wobbleArmMotor.getCurrentPosition();
-            wobbleArmMotor.setPower(-.2);
             opMode.sleep(50);
-            while (wobbleArmMotor.getCurrentPosition() < lastPosition && !opMode.isStarted()) {
-                lastPosition = wobbleArmMotor.getCurrentPosition();
-                opMode.sleep(50);
-            }
-            wobbleArmMotor.setPower(0);
+        }
+        wobbleArmMotor.setPower(0);
         wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
