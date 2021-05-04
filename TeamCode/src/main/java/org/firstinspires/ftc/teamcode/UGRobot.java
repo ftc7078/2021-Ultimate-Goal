@@ -4,6 +4,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -22,13 +25,15 @@ public class UGRobot {
     private DcMotor pickuptop = null;
     private DcMotor pickup = null;
     FlywheelMC flyWheel = null;
-    private HPMC wobbleArmMotor = null;
+    private DcMotor wobbleArmMotor = null;
     private Servo launchServo;
     private Servo gripper;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
     private double idle = 0.61;
     private double flywheelPower = 0.61;
+    private int upWobble = 1000;
+    private int downWobble = 0;
     private ArrayList<Long> toggleQueue = new ArrayList<Long>();
     private boolean launchServoState;
 
@@ -46,7 +51,10 @@ public class UGRobot {
 
         pickupbottom = hardwareMap.get(DcMotor.class, "pickupBottom");
         pickuptop = hardwareMap.get(DcMotor.class, "pickupTop");
-        wobbleArmMotor = new HPMC(hardwareMap, "wobble", 3000);
+        wobbleArmMotor = hardwareMap.get(DcMotor.class,"wobble");
+        wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        wobbleArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         flyWheel = new FlywheelMC(hardwareMap,"shooter",600000);
 
         flyWheel.setDirection(DcMotor.Direction.REVERSE);
@@ -81,6 +89,14 @@ public class UGRobot {
         flyWheel.setPowerAuto(flywheelPower);
     }
 
+    public void moveWobbleArm (boolean up){
+        if (up){
+            wobbleArmMotor.setTargetPosition(upWobble);
+        } else {
+            wobbleArmMotor.setTargetPosition(downWobble);
+        }
+    }
+
     public void clearQueue (){
         toggleQueue.clear();
     }
@@ -96,6 +112,7 @@ public class UGRobot {
         opMode.sleep(200);
 
     }
+
     public void shoot () {
         clearQueue();
         setFlywheel(UGRobot.shooterDirection.OUT);
@@ -125,6 +142,7 @@ public class UGRobot {
                 break;
         }
     }
+
     public void setLaunchServo (boolean in) {
         if(in) {
             launchServo.setPosition(0);
