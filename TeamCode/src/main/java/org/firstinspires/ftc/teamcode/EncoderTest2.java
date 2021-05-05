@@ -26,7 +26,7 @@ public class EncoderTest2 extends LinearOpMode {
 
         wobbleArmMotor = hardwareMap.get(DcMotor.class,"wobble");
         wobbleArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        wobbleArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wobbleArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         wobbleArmMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         wobbleArmMotor.setPower(-0.2);
         int lastEncoder;
