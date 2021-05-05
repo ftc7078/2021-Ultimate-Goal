@@ -12,10 +12,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.ArrayList;
 
-public class UGRobot {
+public class UGRobot implements MecanumDrive.TickCallback {
 
     private Telemetry telemetry;
     private LinearOpMode opMode;
+
+    @Override
+    public void tickCallback() {
+        tick();
+    }
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
 
