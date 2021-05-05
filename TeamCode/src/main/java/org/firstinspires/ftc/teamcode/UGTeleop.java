@@ -94,7 +94,6 @@ public class UGTeleop extends LinearOpMode {
             if (gamepad2.start != isSpeedUpPressed) {
                 if (gamepad2.start) {
                     robot.setFlywheelPower(robot.getFlywheelPower()+0.02);
-                    robot.setIdle(robot.getFlywheelPower()+0.02);
                     robot.setFlywheel(UGRobot.shooterDirection.OUT);
                 }
                 isSpeedUpPressed = gamepad2.start;
@@ -103,7 +102,6 @@ public class UGTeleop extends LinearOpMode {
             if (gamepad2.back != isSpeedDownPressed) {
                 if (gamepad2.back) {
                     robot.setFlywheelPower(robot.getFlywheelPower()-0.02);
-                    robot.setIdle(robot.getFlywheelPower()-0.02);
                     robot.setFlywheel(UGRobot.shooterDirection.OUT);
                 }
                 isSpeedDownPressed = gamepad2.back;

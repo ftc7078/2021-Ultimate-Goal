@@ -52,6 +52,9 @@ public class UGAutonomous extends LinearOpMode {
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap, telemetry, this);
         OD.init(hardwareMap, telemetry,this);
+        mecanumDrive.setupTickCallback(robot);
+        robot.multishotDelay = 175;
+
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -81,57 +84,60 @@ public class UGAutonomous extends LinearOpMode {
 
 
             mecanumDrive.forward(60, 0.7);
-            mecanumDrive.rightTurn(10, 0.2);
-            robot.shoot(true);
-            robot.shoot(true);
-            robot.shoot(true);
-            robot.shoot(true);
+            mecanumDrive.rightTurn(15, 0.2);
+            autoMultiShoot();
             if (ringsFound == UGObjectDetector.ringStackState.NONE) {
-                mecanumDrive.arcMove(0, 72, 0.3, RIGHT, true, true);  //turn
-                mecanumDrive.forward(31, 0.5);                                                     //wobble goal
-                mecanumDrive.arcMove(0, 72, 0.3, RIGHT, false, true); //turn back towards the 2nd wobble goal
-                robot.wobblePosition(middle);                                                                    //set the wobble arm
-                mecanumDrive.backward(65,0.7);                                                     //go to second wobble goal
-                robot.gripper(true);                                                                             //grip the wobble goal
-                robot.wobblePosition(up);                                                                        //lift up the wobble goal
-                mecanumDrive.leftTurn(172,0.4);                                                   //turn toward box
-                mecanumDrive.backward(65,0.7);                                                     //go to box
-                robot.wobblePosition(middle);                                                                    //lower wobble goal
-                robot.gripper(false);                                                                            //let go of wobble goal
-                mecanumDrive.arcMove(12,170,0.4,RIGHT,true,true);     //park
-                // mecanumDrive.backward(6, 0.5); //park old
+                mecanumDrive.arcMove(0, 67, 0.3, RIGHT, true, true);  //turn
+                mecanumDrive.forward(35, 0.5);                                                     //wobble goal
+                mecanumDrive.arcMove(0, -90, 0.3, RIGHT, false, true); //turn back towards the 2nd wobble goal
+                robot.moveWobbleArm(UGRobot.wobblePosition.MID);                                                 //set the wobble arm
+                mecanumDrive.backward(42,0.7);                                                     //go to second wobble goal
+                robot.wobbleServo(true);                                                                   //grip the wobble goal
+                sleep(1200);
+                robot.moveWobbleArm(UGRobot.wobblePosition.CARRY);                                                  //lift up the wobble goal
+                mecanumDrive.leftTurn(176,0.4);                                                  //turn toward box
+                mecanumDrive.backward(37,0.7);                                                     //go to box
+                robot.moveWobbleArm(UGRobot.wobblePosition.DOWN);                                                 //lower wobble goal
+                robot.wobbleServo(false);                                                                  //let go of wobble goal
+                sleep(850);
+                mecanumDrive.arcMove(2,193,0.5,RIGHT,true,true);      //park
+                mecanumDrive.forward(19,0.5,true);
+
             } else if (ringsFound == UGObjectDetector.ringStackState.SINGLE) {
                 mecanumDrive.rightTurn(2, 0.4);                                              //turn
-                mecanumDrive.forward(37, 0.5);                                                //wobble goal
-                mecanumDrive.arcMove(5,24,0.4,RIGHT,false,true); //endStopped was false
+                mecanumDrive.forward(40, 0.5);                                                //wobble goal
+                mecanumDrive.backward(5,0.5);
+                mecanumDrive.arcMove(5,-38,0.4,RIGHT,false,true); //endStopped was false
                 //mecanumDrive.arcMove(8,12,0.4,RIGHT,false,false);                                         X
-                mecanumDrive.rightTurn(80,0.5);                                              //pointed at ring and wobble goal
-                robot.wobblePosition(middle);                                                               //set wobble arm up
-                robot.setPickup(UGRobot.pickupDirection.IN);                                                //turn on pickup
-                mecanumDrive.backward(45,0.4);                                                //pick up ring and go to wobble goal
-                robot.setPickup(UGRobot.pickupDirection.STOP);                                              //stop pickup
-                robot.gripper(true);                                                                        //grip wobble goal
-                robot.wobblePosition(up);                                                                   //pickup the wobble goal
-                mecanumDrive.rightTurn(170,0.5);                                             //point at box
-                mecanumDrive.backward(45,0.6);                                                //go to box
-                robot.wobblePosition(middle);                                                               //lower wobble goal
-                robot.gripper(false);                                                                       //place wobble goal
-                mecanumDrive.forward(12,0.3);                                                 //park
-                //mecanumDrive.backward(19, 0.5);
+                //mecanumDrive.rightTurn(35,0.5);                                              //pointed at ring and wobble goal
+                robot.moveWobbleArm(UGRobot.wobblePosition.MID);                                            //set wobble arm up
+                robot.setPickup(UGRobot.pickupDirection.IN);
+                mecanumDrive.backward(60,0.4);                                                //pick up ring and go to wobble goal
+                robot.wobbleServo(true);                                                              //grip wobble goal
+                sleep(1200);
+                robot.moveWobbleArm(UGRobot.wobblePosition.CARRY);                                             //pickup the wobble goal
+                mecanumDrive.leftTurn(180,0.5);                                             //point at box
+                mecanumDrive.backward(59,0.6);                                                //go to box
+                robot.moveWobbleArm(UGRobot.wobblePosition.MID);                                            //lower wobble goal
+                robot.wobbleServo(false);                                                             //place wobble goal
+                mecanumDrive.forward(6,0.3);                                                 //park
+                robot.setPickup(UGRobot.pickupDirection.STOP);
+
             } else if (ringsFound == UGObjectDetector.ringStackState.QUAD) {
                 mecanumDrive.rightTurn(16, 0.4);                                                  //turn
                 mecanumDrive.forward(72, 0.7);                                                     //wobble goal
-                mecanumDrive.arcMove(0, 70, 0.3, RIGHT, false, true); //turn back towards the 2nd wobble goal
-                robot.wobblePosition(middle);                                                                    //set the wobble arm
-                mecanumDrive.backward(90,0.7);                                                     //go to second wobble goal
-                robot.gripper(true);                                                                             //grip the wobble goal
-                robot.wobblePosition(up);                                                                        //lift up the wobble goal
-                mecanumDrive.leftTurn(175,0.4);                                                   //turn toward box
-                mecanumDrive.backward(90,0.7);                                                     //go to box
-                robot.wobblePosition(middle);                                                                    //lower wobble goal
-                robot.gripper(false);                                                                            //let go of wobble goal
-                mecanumDrive.arcMove(12,170,0.4,RIGHT,true,true);     //park
-                //mecanumDrive.backward(55, 0.7); //park old
+                mecanumDrive.arcMove(0, -33, 0.3, RIGHT, false, true); //turn back towards the 2nd wobble goal
+                robot.moveWobbleArm(UGRobot.wobblePosition.MID);                                                 //set the wobble arm
+                mecanumDrive.backward(85,0.7);                                                     //go to second wobble goal
+                robot.wobbleServo(true);                                                                   //grip the wobble goal
+                sleep(1200);
+                robot.moveWobbleArm(UGRobot.wobblePosition.CARRY);                                                  //lift up the wobble goal
+                mecanumDrive.leftTurn(178,0.4);                                                  //turn toward box
+                mecanumDrive.backward(78,0.7);                                                     //go to box
+                robot.moveWobbleArm(UGRobot.wobblePosition.DOWN);                                                 //lower wobble goal
+                robot.wobbleServo(false);                                                                  //let go of wobble goal
+                sleep(850);
+                mecanumDrive.forward(29,0.5,true);
             }
         } else {
             OD.shutdown();
@@ -155,5 +161,13 @@ public class UGAutonomous extends LinearOpMode {
         sleep(1500);
 
  */
+    }
+
+    private void autoMultiShoot() {
+        robot.multiShoot();
+        while(robot.notDoneShooting()){
+            robot.tick();
+            mecanumDrive.tickSleep();
+        }
     }
 }
