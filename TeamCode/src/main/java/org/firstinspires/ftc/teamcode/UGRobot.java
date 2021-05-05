@@ -33,16 +33,17 @@ public class UGRobot implements MecanumDrive.TickCallback {
     private double flywheelPower = 0.70;
     private int upWobble = 1200;
     private int downWobble = 0;
-    private int midWobble = 550;
+    private int midWobble = 500;
+    private int carryWobble = 610;
     private int lastPosition = 0;
     private double wobblePower = 0.7;
     private ArrayList<Long> toggleQueue = new ArrayList<Long>();
     private boolean launchServoState;
-    private int multishotDelay = 100;
+    int multishotDelay = 100;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {OUT, STOP}
-    enum wobblePosition {UP,DOWN,MID}
+    enum wobblePosition {UP,DOWN,MID,CARRY}
 
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
@@ -128,6 +129,10 @@ public class UGRobot implements MecanumDrive.TickCallback {
             wobbleArmMotor.setPower(wobblePower);
         } else if (targetPosition == wobblePosition.MID){
             wobbleArmMotor.setTargetPosition(midWobble);
+            wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            wobbleArmMotor.setPower(wobblePower);
+        } else if (targetPosition == wobblePosition.CARRY){
+            wobbleArmMotor.setTargetPosition(carryWobble);
             wobbleArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             wobbleArmMotor.setPower(wobblePower);
         }
