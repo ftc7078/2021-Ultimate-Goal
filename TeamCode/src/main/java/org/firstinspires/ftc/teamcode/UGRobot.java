@@ -17,10 +17,7 @@ public class UGRobot implements MecanumDrive.TickCallback {
     private Telemetry telemetry;
     private LinearOpMode opMode;
 
-    @Override
-    public void tickCallback() {
-        tick();
-    }
+
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
 
@@ -33,7 +30,6 @@ public class UGRobot implements MecanumDrive.TickCallback {
     private Servo gripper;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
-    private double idle = 0.61;
     private double flywheelPower = 0.70;
     private int upWobble = 1200;
     private int downWobble = 0;
@@ -117,6 +113,10 @@ public class UGRobot implements MecanumDrive.TickCallback {
         flyWheel.setPowerAuto(flywheelPower);
     }
 
+    public void tickCallback() {
+        tick();
+    }
+
     public void moveWobbleArm (wobblePosition targetPosition){
         if (targetPosition == wobblePosition.UP){
             wobbleArmMotor.setTargetPosition(upWobble);
@@ -156,6 +156,10 @@ public class UGRobot implements MecanumDrive.TickCallback {
 
     public void clearQueue (){
         toggleQueue.clear();
+    }
+
+    public boolean notDoneShooting() {
+        return !toggleQueue.isEmpty();
     }
 
     public void addQueue (int whenMS) {
@@ -208,14 +212,6 @@ public class UGRobot implements MecanumDrive.TickCallback {
             launchServo.setPosition(0.55);
             launchServoState = false;
         }
-    }
-
-    public double getIdle() {
-        return idle;
-    }
-
-    public void setIdle(double idle) {
-        this.idle = idle;
     }
 
     public double getFlywheelPower() {
