@@ -118,7 +118,7 @@ public class UGAutonomous extends LinearOpMode {
                 robot.moveWobbleArm(UGRobot.wobblePosition.CARRY);                                             //pickup the wobble goal
                 mecanumDrive.leftTurn(180,0.5);                                             //point at box
                 mecanumDrive.backward(59,0.6);                                                //go to box
-                robot.moveWobbleArm(UGRobot.wobblePosition.MID);                                            //lower wobble goal
+                robot.moveWobbleArm(UGRobot.wobblePosition.DOWN);                                            //lower wobble goal
                 robot.wobbleServo(false);                                                             //place wobble goal
                 mecanumDrive.forward(6,0.3);                                                 //park
                 robot.setPickup(UGRobot.pickupDirection.STOP);
