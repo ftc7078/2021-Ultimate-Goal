@@ -20,6 +20,8 @@ public class UGTeleop extends LinearOpMode {
     private boolean isWobbleDownTriggered = false;
     private boolean isWobbleOpenTriggered = false;
     private boolean isWobbleCloseTriggered = false;
+    private boolean isMultiShootTriggered = false;
+
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
     private UGRobot robot = new UGRobot();
@@ -70,6 +72,16 @@ public class UGTeleop extends LinearOpMode {
                 telemetry.addData("Manipulator Motors", "Idle");
                 robot.setPickup(UGRobot.pickupDirection.STOP);
             }
+
+
+            if (gamepad2.left_bumper != isMultiShootTriggered) {
+                //mecanumDrive.setMotors(0,0,0, 1);
+                if (gamepad2.left_bumper) {
+                    robot.multiShoot();
+                }
+                isMultiShootTriggered = gamepad2.left_bumper;
+            }
+
 
             if (gamepad2.right_bumper != isShootTriggered) {
                 //mecanumDrive.setMotors(0,0,0, 1);
