@@ -53,7 +53,7 @@ public class UGAutonomous extends LinearOpMode {
         robot.init(hardwareMap, telemetry, this);
         OD.init(hardwareMap, telemetry,this);
         mecanumDrive.setupTickCallback(robot);
-        robot.multishotDelay = 175;
+        robot.multishotDelay = 225;
 
 
         // Tell the driver that initialization is complete.
