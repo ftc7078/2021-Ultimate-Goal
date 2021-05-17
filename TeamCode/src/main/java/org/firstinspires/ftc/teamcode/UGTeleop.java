@@ -121,18 +121,18 @@ public class UGTeleop extends LinearOpMode {
                 isWobbleDownTriggered = gamepad2.dpad_down;
             }
 
-            if (gamepad2.dpad_left != isWobbleCloseTriggered){
-                if (gamepad2.dpad_left){
+            if (gamepad2.dpad_right != isWobbleCloseTriggered){
+                if (gamepad2.dpad_right){
                     robot.wobbleServo(true);
                 }
-                isWobbleCloseTriggered = gamepad2.dpad_left;
+                isWobbleCloseTriggered = gamepad2.dpad_right;
             }
 
-            if (gamepad2.dpad_right != isWobbleOpenTriggered){
-                if (gamepad2.dpad_right){
+            if (gamepad2.dpad_left != isWobbleOpenTriggered){
+                if (gamepad2.dpad_left){
                     robot.wobbleServo(false);
                 }
-                isWobbleOpenTriggered = gamepad2.dpad_right;
+                isWobbleOpenTriggered = gamepad2.dpad_left;
             }
 
             mecanumDrive.tickSleep();
