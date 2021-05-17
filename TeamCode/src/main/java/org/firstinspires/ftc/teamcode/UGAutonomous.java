@@ -122,7 +122,10 @@ public class UGAutonomous extends LinearOpMode {
                 robot.wobbleServo(false);                                                             //place wobble goal
                 mecanumDrive.forward(6,0.3);                                                 //park
                 robot.setPickup(UGRobot.pickupDirection.STOP);
-                mecanumDrive.leftTurn(180,0.5);
+                mecanumDrive.leftTurn(153,0.5);
+                mecanumDrive.backward(24,.3);
+                autoMultiShoot();
+                mecanumDrive.forward(24,.3);
 
             } else if (ringsFound == UGObjectDetector.ringStackState.QUAD) {
                 mecanumDrive.rightTurn(16, 0.4);                                                  //turn
