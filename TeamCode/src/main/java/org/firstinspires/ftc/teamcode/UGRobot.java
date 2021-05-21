@@ -30,7 +30,7 @@ public class UGRobot implements MecanumDrive.TickCallback {
     private Servo gripper;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
-    private double flywheelPower = 0.70;
+    private double flywheelPower = 0.72;
     private int upWobble = 1080;
     private int downWobble = 0;
     private int midWobble = 370;
@@ -44,6 +44,7 @@ public class UGRobot implements MecanumDrive.TickCallback {
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {OUT, STOP}
     enum wobblePosition {UP,DOWN,MID,CARRY}
+    //enum wobbleDirection {UP,DOWN,STOP}
 
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
@@ -158,6 +159,11 @@ public class UGRobot implements MecanumDrive.TickCallback {
         }
 
     }
+
+    //public void addWobble(UGRobot.wobbleDirection direction) {
+        //wobbleState = direction;
+        //case UP:
+    //}
 
     public void clearQueue (){
         toggleQueue.clear();
