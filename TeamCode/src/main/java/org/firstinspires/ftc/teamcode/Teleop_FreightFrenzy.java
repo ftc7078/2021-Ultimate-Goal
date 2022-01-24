@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Movment_FreightFrenzy", group="Linear Opmode")
 
-public class Movment_FreightFrenzy extends LinearOpMode {
+public class Teleop_FreightFrenzy extends LinearOpMode {
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -59,4 +59,3 @@ public class Movment_FreightFrenzy extends LinearOpMode {
     }
 
 }
-r

@@ -54,7 +54,6 @@ public class JustMecanum extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            gamepad1.setJoystickDeadzone((float)0.2);
             double speed = 1;
 
              speed = (gamepad1.right_trigger * 0.6) + 0.4;
