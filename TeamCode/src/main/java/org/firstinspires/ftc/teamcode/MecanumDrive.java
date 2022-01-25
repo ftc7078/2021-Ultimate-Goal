@@ -38,6 +38,7 @@ public class MecanumDrive {
     double                  globalAngle,  correction;
 
     private HPMC[] motors = new HPMC[4];
+
     private double[] power = new double[4];
     private long[] startingPositions = new long[4];
     private final double MOTOR_SPEED = 2800;
@@ -58,11 +59,11 @@ public class MecanumDrive {
     private long nextWake = 0;
     static long tickTime = 50; //in milliseconds
     private TickCallback callback;
-
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
 
         telemetry = telemetryIn;
         opMode = opModeIn;
+
         motors[FL] = new HPMC(hardwareMap, "left_front", MOTOR_SPEED);
         motors[BL] = new HPMC(hardwareMap, "left_back", MOTOR_SPEED);
         motors[FR] = new HPMC(hardwareMap, "right_front", MOTOR_SPEED);
@@ -83,10 +84,10 @@ public class MecanumDrive {
 
 
         // Reverse the motors that runs backwards when connected directly to the battery
-        motors[FL].setDirection(DcMotor.Direction.FORWARD);
+        motors[FL].setDirection(DcMotor.Direction.REVERSE);
         motors[BL].setDirection(DcMotor.Direction.FORWARD);
-        motors[FR].setDirection(DcMotor.Direction.REVERSE);
-        motors[BR].setDirection(DcMotor.Direction.REVERSE);
+        motors[FR].setDirection(DcMotor.Direction.FORWARD);
+        motors[BR].setDirection(DcMotor.Direction.FORWARD);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
