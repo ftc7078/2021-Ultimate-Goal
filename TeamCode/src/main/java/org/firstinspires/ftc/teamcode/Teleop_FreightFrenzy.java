@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Movment_FreightFrenzy", group="Linear Opmode")
+@TeleOp(name="FreightFrenzy_Teleop", group="Linear Opmode")
 
 public class Teleop_FreightFrenzy extends LinearOpMode {
 

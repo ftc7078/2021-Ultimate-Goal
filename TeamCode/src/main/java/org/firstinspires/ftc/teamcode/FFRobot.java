@@ -14,6 +14,11 @@ public class FFRobot {
 
     private Telemetry telemetry;
     private LinearOpMode opMode;
+    private Servo shippingElementPickup;
+    private Servo pickupDoor;
+    private DcMotor pickup;
+    private DcMotor arm;
+    private DcMotor duckWheel;
 
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
@@ -24,6 +29,7 @@ public class FFRobot {
     private Servo foundationRight;
     public ManipulatorDirection manipulatorState;
     public boolean manipulatorAutostop = false;
+    //bellow is old
     Servo capstoneArm;
     Servo capstoneDrop;
     Servo inRamp;
@@ -35,6 +41,12 @@ public class FFRobot {
         telemetry = telemetryIn;
         opMode = opModeIn;
 
+        shippingElementPickup = hardwareMap.get(Servo.class,"shipping_element_pickup");
+        pickupDoor = hardwareMap.get(Servo.class,"pickup_door");
+        pickup = hardwareMap.get(DcMotor.class,"pickup");
+        arm = hardwareMap.get(DcMotor.class,"arm");
+        duckWheel = hardwareMap.get(DcMotor.class,"duck_wheel");
+        /*
         foundationLeft = hardwareMap.get(Servo.class, "foundationLeft");
         foundationRight = hardwareMap.get(Servo.class, "foundationRight");
         capstoneArm = hardwareMap.get(Servo.class, "capstone_arm");
