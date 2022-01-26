@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,8 +18,19 @@ public class FFRobot {
     private Servo shippingElementPickup;
     private Servo pickupDoor;
     private DcMotor pickup;
-    private DcMotor arm;
+    public DcMotor arm;
     private DcMotor duckWheel;
+    private int high = 800;
+    private int middle = 600;
+    private int low = 400;
+    private int pickUp = 300;
+    private double armPower = 0.3;
+    public final static double DOOR_DOWN = 0;
+    public final static double DOOR_UP= 1;
+
+
+
+    public enum armPosition {HIGH,MIDDLE,LOW,PICKUP}
 
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
@@ -41,96 +53,51 @@ public class FFRobot {
         telemetry = telemetryIn;
         opMode = opModeIn;
 
-        shippingElementPickup = hardwareMap.get(Servo.class,"shipping_element_pickup");
-        pickupDoor = hardwareMap.get(Servo.class,"pickup_door");
-        pickup = hardwareMap.get(DcMotor.class,"pickup");
-        arm = hardwareMap.get(DcMotor.class,"arm");
-        duckWheel = hardwareMap.get(DcMotor.class,"duck_wheel");
-        /*
-        foundationLeft = hardwareMap.get(Servo.class, "foundationLeft");
-        foundationRight = hardwareMap.get(Servo.class, "foundationRight");
-        capstoneArm = hardwareMap.get(Servo.class, "capstone_arm");
-        capstoneDrop = hardwareMap.get(Servo.class, "capstone_drop");
-        inRamp = hardwareMap.get(Servo.class, "in_ramp");
+        shippingElementPickup = hardwareMap.get(Servo.class, "shipping_element_pickup");
+        pickupDoor = hardwareMap.get(Servo.class, "pickup_door");
+        pickup = hardwareMap.get(DcMotor.class, "pickup");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        duckWheel = hardwareMap.get(DcMotor.class, "duck_wheel");
 
-        leftManipulator = hardwareMap.get(DcMotor.class, "left_manipulator");
-        rightManipulator = hardwareMap.get(DcMotor.class, "right_manipulator");
-
-        digitalTouch = hardwareMap.get(DigitalChannel.class, "switch");
-
-        leftManipulator.setPower(0);
-        rightManipulator.setPower(0);
-
-        dropCapstone(false);
-        foundationMover(true);
-        inRamp.setPosition(0);
-
-        digitalTouch.setMode(DigitalChannel.Mode.INPUT);
-
-        // Reverse the motors that runs backwards when connected directly to the battery
-
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.moveArm(armPosition.LOW);
     }
-
-    void capstoneArm(boolean out) {
-        if (out) {
-            capstoneArm.setPosition(1);
+    public void moveArm (armPosition targetPosition){
+        if (targetPosition == armPosition.HIGH){
+            arm.setTargetPosition(high);
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setPower(armPower);
+            pickupDoor.setPosition(DOOR_UP);
+        } else if (targetPosition == armPosition.MIDDLE){
+            arm.setTargetPosition(middle);
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setPower(armPower);
+            pickupDoor.setPosition(DOOR_UP);
+        } else if (targetPosition == armPosition.LOW){
+            arm.setTargetPosition(low);
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setPower(armPower);
+            pickupDoor.setPosition(DOOR_UP);
+        } else if (targetPosition == armPosition.PICKUP){
+            arm.setTargetPosition(pickUp);
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setPower(armPower);
+            pickupDoor.setPosition(DOOR_DOWN);
+        }
+    }
+    public void pickup(boolean on) {
+        if (on) {
+            pickup.setPower(1);
         } else {
-            capstoneArm.setPosition(0);
+            pickup.setPower(0);
         }
     }
-    void dropCapstone (boolean open) {
-        if (open) {
-            capstoneDrop.setPosition(.5);
-
+    public void setDuckWheel(boolean on){
+        if (on) {
+            duckWheel.setPower(1);
         } else {
-            capstoneDrop.setPosition(1);
+            duckWheel.setPower(0);
         }
     }
-
-    void foundationMover(boolean up ){
-        if (up){
-            foundationLeft.setPosition(.35);
-            foundationRight.setPosition(.65);
-        } else {
-            foundationLeft.setPosition(.6);
-            foundationRight.setPosition(.4);
-        }
-    }
-
-    void setManipulator(ManipulatorDirection direction) {
-        setManipulator(direction, false);
-    }
-
-    void setManipulator(ManipulatorDirection direction, boolean autoStop) {
-        manipulatorAutostop = autoStop;
-        manipulatorState = direction;
-        switch (direction) {
-            case IN:
-                inRamp.setPosition(1);
-                leftManipulator.setPower(-1);
-                rightManipulator.setPower(1);
-                break;
-            case OUT:
-                inRamp.setPosition(0);
-                leftManipulator.setPower(1);
-                rightManipulator.setPower(-1);
-                break;
-            case STOP:
-                leftManipulator.setPower(0);
-                rightManipulator.setPower(0);
-                inRamp.setPosition(0);
-                break;
-        }
-    }
-
-    void manipulatorAutostop() {
-        if (manipulatorAutostop && (manipulatorState != ManipulatorDirection.STOP)) {
-            setManipulator(ManipulatorDirection.STOP);
-        }
-    }
-
-    boolean switchPressed() {
-        return !digitalTouch.getState();
-    }
-
 }
