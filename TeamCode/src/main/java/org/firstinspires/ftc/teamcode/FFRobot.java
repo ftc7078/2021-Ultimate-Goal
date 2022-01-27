@@ -20,10 +20,10 @@ public class FFRobot {
     private DcMotor pickup;
     public DcMotor arm;
     private DcMotor duckWheel;
-    private int high = 800;
+    private int high = 1200;
     private int middle = 600;
-    private int low = 400;
-    private int pickUp = 300;
+    private int low = 500;
+    private int pickUp = 000;
     private double armPower = 0.3;
     public final static double DOOR_DOWN = 0;
     public final static double DOOR_UP= 1;
@@ -60,8 +60,11 @@ public class FFRobot {
         duckWheel = hardwareMap.get(DcMotor.class, "duck_wheel");
 
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.moveArm(armPosition.LOW);
+        this.moveArm(armPosition.PICKUP);
+
+        pickup.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void moveArm (armPosition targetPosition){
         if (targetPosition == armPosition.HIGH){
@@ -88,16 +91,15 @@ public class FFRobot {
     }
     public void pickup(boolean on) {
         if (on) {
-            pickup.setPower(1);
+            pickup.setPower(0.7);
         } else {
             pickup.setPower(0);
         }
     }
-    public void setDuckWheel(boolean on){
-        if (on) {
-            duckWheel.setPower(1);
-        } else {
-            duckWheel.setPower(0);
-        }
+    public void setDuckWheel(double power){
+        duckWheel.setPower(power);
+    }
+    public void setShippingElementPickupPosition(double position){
+        shippingElementPickup.setPosition(position);
     }
 }
