@@ -67,25 +67,34 @@ public class Teleop_FreightFrenzy extends LinearOpMode {
             }
             if (gamepad1.a) {
                 robot.moveArm(FFRobot.armPosition.PICKUP);
-
             }
+
+
             if (gamepad1.right_bumper) {
                 robot.arm.setPower(0);
                 robot.arm.setTargetPosition(robot.arm.getCurrentPosition());
             }
            if (gamepad1.b) {
-               robot.pickup(true)
+               robot.pickup(true);
            } else {
-               robot.pickup(false)
+               robot.pickup(false);
 
            }
-            if (gamepad1.y) {
-                robot.setDuckWheel(true);
+            if (gamepad1.left_bumper) {
+                robot.setDuckWheel(0.7);
+            } else if(gamepad1.right_bumper) {
+                robot.setDuckWheel(-0.7);
             } else {
-                robot.setDuckWheel(false);
-
+                robot.setDuckWheel(0);
             }
+            robot.setShippingElementPickupPosition(gamepad1.left_trigger);
+
+
+
+
+
             mecanumDrive.tickSleep();
+            telemetry.addData("gp1lt", gamepad1.left_trigger);
             //telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("Motor Power",robot.arm.getPower());
             telemetry.addData("Motor Position",robot.arm.getCurrentPosition());
