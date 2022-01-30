@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Just Mecanum", group="Linear Opmode")
+@TeleOp(name="Test: Just Mecanum", group="Test")
 
 public class JustMecanum extends LinearOpMode {
 

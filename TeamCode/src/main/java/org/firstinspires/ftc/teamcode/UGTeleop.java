@@ -2,12 +2,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="UG Teleop", group="Linear Opmode")
+@TeleOp(name="UG Teleop", group="Disabled")
+@Disabled
 
 public class UGTeleop extends LinearOpMode {
 
