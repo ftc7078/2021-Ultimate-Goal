@@ -39,10 +39,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="FreightFrenzyAuto", group ="Autonomous")
+@Autonomous(name="FreightFrenzyAuto_Red1", group ="Autonomous")
 
 
-public class FFAutonomous extends LinearOpMode {
+public class FFAutonomousRedOne extends LinearOpMode {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
