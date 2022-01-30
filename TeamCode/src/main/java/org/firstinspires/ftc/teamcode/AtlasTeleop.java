@@ -2,12 +2,14 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Atlas Teleop", group="Disabled")
+@TeleOp(name="Atlas Teleop", group="Test")
+@Disabled
 
 public class AtlasTeleop extends LinearOpMode {
 

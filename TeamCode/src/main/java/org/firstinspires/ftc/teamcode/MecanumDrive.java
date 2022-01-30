@@ -44,7 +44,7 @@ public class MecanumDrive {
     private final double MOTOR_SPEED = 2800;
     private final long COUNT_PER_INCH = 40;
     private final long COUNT_PER_INCH_STRAFING = 60;
-    private final double COUNT_PER_DEGREE = 8.9;
+    private final double COUNT_PER_DEGREE = 10;
 
 
     private final int FL = 0;
