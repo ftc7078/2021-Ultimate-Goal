@@ -65,9 +65,9 @@ public class FFAutonomousBlueOne extends LinearOpMode {
         //START OF FFAuto
     // Auto Position 1
         mecanumDrive.forward(6,0.5,true);
-        mecanumDrive.leftTurn(95,0.5);
+        mecanumDrive.rightTurn(95,0.5);
         mecanumDrive.forward(21,0.6,true);
-        mecanumDrive.leftTurn(25,0.5);
+        mecanumDrive.rightTurn(25,0.5);
         mecanumDrive.forward(3,0.3,true);
 
         for (int i=1; i<10; i++) {
@@ -77,15 +77,15 @@ public class FFAutonomousBlueOne extends LinearOpMode {
         robot.setDuckWheel(1);
         sleep(3000);
         robot.setDuckWheel(0);
-        mecanumDrive.arcMove(1,-37,0.4,MecanumDrive.MoveDirection.LEFT,false,true);
+        mecanumDrive.arcMove(1,-37,0.4,MecanumDrive.MoveDirection.RIGHT,false,true);
         mecanumDrive.backward(25,0.6);
         robot.moveArm(FFRobot.armPosition.HIGH);
-        mecanumDrive.arcMove(3,-105,0.5, MecanumDrive.MoveDirection.RIGHT,false,true);
+        mecanumDrive.arcMove(3,-105,0.5, MecanumDrive.MoveDirection.LEFT,false,true);
         mecanumDrive.backward(9,0.5);
         robot.setDoorPosition(FFRobot.doorPosition.DUMP);
         sleep(1000);
         mecanumDrive.forward(4,0.3);
-        mecanumDrive.arcMove(3,110,0.6,MecanumDrive.MoveDirection.LEFT,false,true);
+        mecanumDrive.arcMove(3,110,0.6,MecanumDrive.MoveDirection.RIGHT,false,true);
         mecanumDrive.forward(50,1);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
         robot.moveArm(FFRobot.armPosition.PICKUP);
