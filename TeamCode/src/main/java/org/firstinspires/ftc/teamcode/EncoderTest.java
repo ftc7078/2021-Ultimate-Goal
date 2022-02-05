@@ -22,6 +22,7 @@ public class EncoderTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        int maxRpm = 0;
         shooter = new HPMC(hardwareMap, "shooter", 2800);
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
          telemetry.addData("Status", "Initialized");
@@ -30,12 +31,20 @@ public class EncoderTest extends LinearOpMode {
          telemetry.clear();
          shooter.setPowerAuto(0.12);
          while (opModeIsActive()) {
-            telemetry.addData("Time:", runtime.seconds());
+             int rpm = (int) (shooter.getCurrentVelocity()*60/8192);
+            if (rpm > maxRpm) {
+                maxRpm=rpm;
+            }
+             telemetry.addData("Time:", runtime.seconds());
             shooter.updateCurrentVelocity();
             
             shooter.autoAdjust();
             telemetry.addData("Velocity", shooter.getCurrentVelocity());
-            telemetry.addData("RawPower", shooter.getPower());
+             telemetry.addData("RPM", rpm);
+             telemetry.addData("Max RPM", maxRpm);
+
+
+             telemetry.addData("RawPower", shooter.getPower());
             telemetry.update();
             tickSleep();
          }
