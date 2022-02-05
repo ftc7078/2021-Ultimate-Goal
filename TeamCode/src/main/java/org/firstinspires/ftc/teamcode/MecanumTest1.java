@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -38,8 +40,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import static java.lang.Math.sqrt;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Mecanum Test 1", group ="Tests")
-
+@Autonomous(name="Mecanum Test 1", group ="Tests")
+@Disabled
 public class MecanumTest1 extends LinearOpMode {
 
 

@@ -50,7 +50,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
+@Autonomous(name = "Concept: TensorFlow Object Detection Webcam", group = "Test")
+@Disabled
 
 public class TensorFlowSample2 extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";

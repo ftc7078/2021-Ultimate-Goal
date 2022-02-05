@@ -2,6 +2,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,21 +18,22 @@ public class FFRobot {
     private Telemetry telemetry;
     private LinearOpMode opMode;
     private Servo shippingElementPickup;
-    private Servo pickupDoor;
-    private DcMotor pickup;
+    Servo pickupDoor;
+    DcMotor pickup;
     public DcMotor arm;
     private DcMotor duckWheel;
-    private int high = 1200;
-    private int middle = 600;
-    private int low = 500;
+    private int high = 1500;
+    private int carry = 600;
     private int pickUp = 000;
-    private double armPower = 0.3;
+    private double armPower = 0.7;
     public final static double DOOR_DOWN = 0;
     public final static double DOOR_UP= 1;
 
 
 
-    public enum armPosition {HIGH,MIDDLE,LOW,PICKUP}
+    public enum armPosition {HIGH,CARRY,PICKUP}
+    public enum doorPosition {PICKUP,CARRY,DUMP}
+
 
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
@@ -41,6 +44,9 @@ public class FFRobot {
     private Servo foundationRight;
     public ManipulatorDirection manipulatorState;
     public boolean manipulatorAutostop = false;
+    public int dropped=0;
+    public doorPosition currentDoorPosition=null;
+    public armPosition currentArmPosition=null;
     //bellow is old
     Servo capstoneArm;
     Servo capstoneDrop;
@@ -60,33 +66,48 @@ public class FFRobot {
         duckWheel = hardwareMap.get(DcMotor.class, "duck_wheel");
 
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        Log.d("FFRobot", "init: "+pickupDoor.getPosition());
+
+
+
+        this.arm.setPower(-0.1);
+        int lastPosition = arm.getCurrentPosition();
+        int startPosition = arm.getCurrentPosition();
+
+
+        opMode.sleep(50);
+        while (arm.getCurrentPosition() != lastPosition) {
+            lastPosition=arm.getCurrentPosition();
+            opMode.sleep(50);
+        }
+        dropped=arm.getCurrentPosition() - startPosition;
+
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        this.setDoorPosition(doorPosition.CARRY);
         this.moveArm(armPosition.PICKUP);
 
         pickup.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void moveArm (armPosition targetPosition){
+        currentArmPosition=targetPosition;
         if (targetPosition == armPosition.HIGH){
             arm.setTargetPosition(high);
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             arm.setPower(armPower);
-            pickupDoor.setPosition(DOOR_UP);
-        } else if (targetPosition == armPosition.MIDDLE){
-            arm.setTargetPosition(middle);
+
+        } else if (targetPosition == armPosition.CARRY){
+            arm.setTargetPosition(carry);
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             arm.setPower(armPower);
-            pickupDoor.setPosition(DOOR_UP);
-        } else if (targetPosition == armPosition.LOW){
-            arm.setTargetPosition(low);
-            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setPower(armPower);
-            pickupDoor.setPosition(DOOR_UP);
+
         } else if (targetPosition == armPosition.PICKUP){
             arm.setTargetPosition(pickUp);
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setPower(armPower);
-            pickupDoor.setPosition(DOOR_DOWN);
+            arm.setPower(armPower/2);
         }
     }
     public void pickup(boolean on) {
@@ -98,6 +119,21 @@ public class FFRobot {
     }
     public void setDuckWheel(double power){
         duckWheel.setPower(power);
+    }
+    public void setDoorPosition(doorPosition position) {
+        currentDoorPosition=position;
+        if (currentArmPosition == armPosition.PICKUP) {
+            position = doorPosition.PICKUP;
+        }
+        if (position == doorPosition.CARRY) {
+            pickupDoor.setPosition(0.3);
+        }
+        if (position == doorPosition.DUMP) {
+            pickupDoor.setPosition(1);
+        }
+        if (position == doorPosition.PICKUP) {
+            pickupDoor.setPosition(0);
+        }
     }
     public void setShippingElementPickupPosition(double position){
         shippingElementPickup.setPosition(position);

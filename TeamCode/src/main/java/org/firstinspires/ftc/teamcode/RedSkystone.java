@@ -29,10 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Red Skystone", group ="Disabled")
+@Autonomous(name="Red Skystone", group ="Disabled")
+@Disabled
 
 public class RedSkystone extends LinearOpMode implements MecanumDrive.TickCallback {
 

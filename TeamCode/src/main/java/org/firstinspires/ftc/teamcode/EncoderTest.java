@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Encoder Test", group="Linear Opmode")
+@TeleOp(name="Test: Encoder Test", group="Test")
 
 public class EncoderTest extends LinearOpMode {
 
