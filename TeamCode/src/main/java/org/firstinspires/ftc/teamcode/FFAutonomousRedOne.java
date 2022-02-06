@@ -70,40 +70,51 @@ public class FFAutonomousRedOne extends LinearOpMode {
         waitForStart();
 
         //START OF FFAuto
-    // Auto Position 1
+    // Auto Position Red 1
         mecanumDrive.forward(6,0.5,true);
         mecanumDrive.leftTurn(95,0.5);
         mecanumDrive.forward(21,0.6,true);
         mecanumDrive.leftTurn(25,0.5);
-        mecanumDrive.forward(3,0.3,true);
+        mecanumDrive.forward(3.5,0.3,true);
 
         for (int i=1; i<10; i++) {
-            robot.setDuckWheel(0.1*i);
+            robot.setDuckWheel(-0.1*i);
             sleep(50);
         }
-        robot.setDuckWheel(1);
+        robot.setDuckWheel(-1);
         sleep(3000);
         robot.setDuckWheel(0);
         mecanumDrive.arcMove(1,-37,0.4,MecanumDrive.MoveDirection.LEFT,false,true);
         mecanumDrive.backward(25,0.6);
         robot.moveArm(FFRobot.armPosition.HIGH);
         mecanumDrive.arcMove(3,-105,0.5, MecanumDrive.MoveDirection.RIGHT,false,true);
-        mecanumDrive.backward(9,0.5);
+        //moved to hub : now move back to it (was 8 changed to 8.5 when synching w/ blue side from comp)
+        mecanumDrive.backward(8.5,0.4);
         robot.setDoorPosition(FFRobot.doorPosition.DUMP);
         sleep(1000);
-        mecanumDrive.forward(4,0.3);
-        mecanumDrive.arcMove(3,110,0.6,MecanumDrive.MoveDirection.LEFT,false,true);
+        //below distance to go away from the hub
+        mecanumDrive.forward(3,0.3);
+        mecanumDrive.arcMove(3,115,0.6,MecanumDrive.MoveDirection.LEFT,false,true);
+        //angle before parking : now distance for parking
+        mecanumDrive.forward(60,1);
+        robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
+        robot.moveArm(FFRobot.armPosition.PICKUP);
+
+        /* Plan B w/out arc move
+        mecanumDrive.rightTurn(90,0.5);
         mecanumDrive.forward(50,1);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
         robot.moveArm(FFRobot.armPosition.PICKUP);
-        sleep(2000);
-        robot.pickup(true);
-        mecanumDrive.forward(18,0.3,true);
-        robot.pickup(false);
+        */
 
-        //Drive back
+
+
+
+        //Drive back - comment out for competition
         robot.moveArm(FFRobot.armPosition.PICKUP);
+        sleep(300);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
+
         while (opModeIsActive()) {
             double speed = 1;
 

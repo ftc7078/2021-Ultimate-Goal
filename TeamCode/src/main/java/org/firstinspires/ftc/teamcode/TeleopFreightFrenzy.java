@@ -55,7 +55,7 @@ public class TeleopFreightFrenzy extends LinearOpMode {
         while (opModeIsActive()) {
             double speed = 1;
 
-             speed = (gamepad1.right_trigger * 0.3) + 0.7;
+             speed = (gamepad1.right_trigger * 0.6) + 0.4;
             double fwd = -addDeadZone(gamepad1.left_stick_y);
             double strafe = -addDeadZone(gamepad1.left_stick_x);
             double rot= addDeadZone(gamepad1.right_stick_x);
@@ -81,6 +81,8 @@ public class TeleopFreightFrenzy extends LinearOpMode {
                 robot.pickup(false);
                 if (robot.currentArmPosition == armPosition.PICKUP) {
                     robot.moveArm(armPosition.CARRY);
+                } else if (robot.currentArmPosition == armPosition.HIGH) {
+                    robot.moveArm(armPosition.HIGH, (int) (gamepad2.left_trigger*300) ) ;
                 }
                 if (gamepad2.dpad_up) {
                     robot.setDoorPosition(doorPosition.CARRY);

@@ -63,12 +63,12 @@ public class FFAutonomousBlueOne extends LinearOpMode {
         waitForStart();
 
         //START OF FFAuto
-    // Auto Position 1
+    // Auto Position Blue 1
         mecanumDrive.forward(6,0.5,true);
         mecanumDrive.rightTurn(95,0.5);
         mecanumDrive.forward(21,0.6,true);
         mecanumDrive.rightTurn(25,0.5);
-        mecanumDrive.forward(3,0.3,true);
+        mecanumDrive.forward(3.5,0.3,true);
 
         for (int i=1; i<10; i++) {
             robot.setDuckWheel(0.1*i);
@@ -81,22 +81,24 @@ public class FFAutonomousBlueOne extends LinearOpMode {
         mecanumDrive.backward(25,0.6);
         robot.moveArm(FFRobot.armPosition.HIGH);
         mecanumDrive.arcMove(3,-105,0.5, MecanumDrive.MoveDirection.LEFT,false,true);
-        mecanumDrive.backward(9,0.5);
+        //moved to the hub : now move back to it
+        mecanumDrive.backward(8.5,0.4);
         robot.setDoorPosition(FFRobot.doorPosition.DUMP);
         sleep(1000);
-        mecanumDrive.forward(4,0.3);
-        mecanumDrive.arcMove(3,110,0.6,MecanumDrive.MoveDirection.RIGHT,false,true);
-        mecanumDrive.forward(50,1);
+        //below distance to go away from the hub
+        mecanumDrive.forward(3,0.3);
+        mecanumDrive.arcMove(3,115,0.6,MecanumDrive.MoveDirection.RIGHT,false,true);
+        //angle before parking : now distance for parking
+        mecanumDrive.forward(60,1);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
         robot.moveArm(FFRobot.armPosition.PICKUP);
-        sleep(2000);
-        robot.pickup(true);
-        mecanumDrive.forward(18,0.3,true);
-        robot.pickup(false);
 
-        //Drive back
+
+        //Drive back - comment out for compeition
         robot.moveArm(FFRobot.armPosition.PICKUP);
+        sleep(300);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
+
         while (opModeIsActive()) {
             double speed = 1;
 
@@ -115,6 +117,8 @@ public class FFAutonomousBlueOne extends LinearOpMode {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
         }
+
+
 
 
         /* [This is for the ring selection could use this for FF]

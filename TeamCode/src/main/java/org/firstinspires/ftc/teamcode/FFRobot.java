@@ -92,10 +92,13 @@ public class FFRobot {
 
         pickup.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public void moveArm (armPosition targetPosition){
+    public void moveArm (armPosition targetPosition) {
+        moveArm(targetPosition, 0);
+    }
+    public void moveArm (armPosition targetPosition, int drop){
         currentArmPosition=targetPosition;
         if (targetPosition == armPosition.HIGH){
-            arm.setTargetPosition(high);
+            arm.setTargetPosition(high-drop);
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             arm.setPower(armPower);
 
