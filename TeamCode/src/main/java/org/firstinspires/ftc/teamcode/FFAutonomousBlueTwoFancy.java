@@ -30,24 +30,26 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="FreightFrenzyAuto_Blue2", group ="Autonomous")
+@Autonomous(name="FreightFrenzyAuto_Blue2_Fancy", group ="Autonomous")
+@Disabled
 
-
-public class FFAutonomousBlueTwo extends LinearOpMode {
+public class FFAutonomousBlueTwoFancy extends LinearOpMode {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
     private FFRobot robot = new FFRobot();
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
-    private int DWAS = 2;//Duck Wheel Acceleration Speed
+    //private int DWAS = 2;//Duck Wheel Acceleration Speed
 
 
 
 
-    @Override public void runOpMode() {
+    @Override public void runOpMode()
+    {
 
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap, telemetry, this);
@@ -63,13 +65,43 @@ public class FFAutonomousBlueTwo extends LinearOpMode {
         waitForStart();
 
         //START OF FFAuto
-    // Auto Position 2
-        //Blue
-        mecanumDrive.forward(9,0.5);
-        mecanumDrive.leftTurn(90,0.5);
-        mecanumDrive.forward(35,1);
+    // Auto Position 2 Fancy
 
-        //Drive back - comment out for compeititon
+        //dump
+        mecanumDrive.backward(5,.5);
+        mecanumDrive.rightTurn(45,.5);
+        mecanumDrive.backward(24,.5);
+        robot.setDoorPosition(FFRobot.doorPosition.DUMP);
+        sleep(500);
+
+        //duck wheel
+        mecanumDrive.forward(6,.5);
+        mecanumDrive.rightTurn(90,.5);
+        mecanumDrive.forward(48,.5);
+
+        for (int i=1; i<10; i++) {
+            robot.setDuckWheel(0.1*i);
+            sleep(50);
+        }
+        robot.setDuckWheel(1);
+        sleep(3000);
+        robot.setDuckWheel(0);
+
+        //pickup
+        mecanumDrive.backward(6,.5);
+        mecanumDrive.rightTurn(135,.5);
+        mecanumDrive.forward(96,.5);
+        robot.pickup(true);
+        mecanumDrive.forward(5,.5);
+        robot.pickup(false);
+
+        //dump
+        mecanumDrive.leftTurn(45,.5);
+        mecanumDrive.backward(48,.5);
+        robot.setDoorPosition(FFRobot.doorPosition.DUMP);
+        mecanumDrive.forward(48,.5);
+
+        //Drive back - comment out for competition
         robot.moveArm(FFRobot.armPosition.PICKUP);
         sleep(300);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);

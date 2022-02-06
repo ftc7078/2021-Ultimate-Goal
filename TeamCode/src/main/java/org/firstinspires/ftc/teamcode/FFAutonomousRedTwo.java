@@ -67,7 +67,12 @@ public class FFAutonomousRedTwo extends LinearOpMode {
         //Red
         mecanumDrive.forward(9,0.5);
         mecanumDrive.rightTurn(90,0.5);
-        mecanumDrive.forward(15,0.8);
+        mecanumDrive.forward(35,1);
+
+        //Drive Back - comment out for compeition
+        robot.moveArm(FFRobot.armPosition.PICKUP);
+        sleep(300);
+        robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
 
         while (opModeIsActive()) {
             double speed = 1;
@@ -87,6 +92,7 @@ public class FFAutonomousRedTwo extends LinearOpMode {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
         }
+
 
 
         /* [This is for the ring selection could use this for FF]
