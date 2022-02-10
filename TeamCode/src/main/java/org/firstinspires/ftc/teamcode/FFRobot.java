@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 public class FFRobot {
 
     private Telemetry telemetry;
@@ -24,7 +23,7 @@ public class FFRobot {
     private DcMotor duckWheel;
     private int high = 1500;
     private int carry = 600;
-    private int pickUp = 000;
+    private int pickUp = 200;
     private double armPower = 0.7;
     public final static double DOOR_DOWN = 0;
     public final static double DOOR_UP= 1;
@@ -129,13 +128,13 @@ public class FFRobot {
             position = doorPosition.PICKUP;
         }
         if (position == doorPosition.CARRY) {
-            pickupDoor.setPosition(0.3);
+            pickupDoor.setPosition(0.8);
         }
         if (position == doorPosition.DUMP) {
-            pickupDoor.setPosition(1);
+            pickupDoor.setPosition(0);
         }
         if (position == doorPosition.PICKUP) {
-            pickupDoor.setPosition(0);
+            pickupDoor.setPosition(1);
         }
     }
     public void setShippingElementPickupPosition(double position){

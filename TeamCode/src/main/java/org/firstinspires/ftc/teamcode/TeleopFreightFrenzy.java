@@ -82,7 +82,7 @@ public class TeleopFreightFrenzy extends LinearOpMode {
                 if (robot.currentArmPosition == armPosition.PICKUP) {
                     robot.moveArm(armPosition.CARRY);
                 } else if (robot.currentArmPosition == armPosition.HIGH) {
-                    robot.moveArm(armPosition.HIGH, (int) (gamepad2.left_trigger*300) ) ;
+                    robot.moveArm(armPosition.HIGH, (int) (gamepad2.left_trigger*250) ) ;
                 }
                 if (gamepad2.dpad_up) {
                     robot.setDoorPosition(doorPosition.CARRY);
