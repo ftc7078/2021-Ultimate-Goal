@@ -24,7 +24,8 @@ public class FFRobot {
     private int high = 1500;
     private int carry = 600;
     private int pickUp = 200;
-    private double armPower = 0.7;
+    private double armPowerUp = 0.7;
+    private double armPowerDown = 0.45;
     public final static double DOOR_DOWN = 0;
     public final static double DOOR_UP= 1;
 
@@ -45,7 +46,7 @@ public class FFRobot {
     public boolean manipulatorAutostop = false;
     public int dropped=0;
     public doorPosition currentDoorPosition=null;
-    public armPosition currentArmPosition=null;
+    public armPosition roughTargetPosition =null;
     //bellow is old
     Servo capstoneArm;
     Servo capstoneDrop;
@@ -95,22 +96,20 @@ public class FFRobot {
         moveArm(targetPosition, 0);
     }
     public void moveArm (armPosition targetPosition, int drop){
-        currentArmPosition=targetPosition;
+        roughTargetPosition = targetPosition;
         if (targetPosition == armPosition.HIGH){
             arm.setTargetPosition(high-drop);
-            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setPower(armPower);
-
         } else if (targetPosition == armPosition.CARRY){
-            arm.setTargetPosition(carry);
-            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setPower(armPower);
-
+            arm.setTargetPosition(carry-drop);
         } else if (targetPosition == armPosition.PICKUP){
             arm.setTargetPosition(pickUp);
-            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setPower(armPower/2);
         }
+        if (arm.getCurrentPosition() > arm.getTargetPosition() ) {
+            arm.setPower(armPowerDown);
+        } else {
+            arm.setPower(armPowerUp);
+        }
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void pickup(boolean on) {
         if (on) {
@@ -124,11 +123,11 @@ public class FFRobot {
     }
     public void setDoorPosition(doorPosition position) {
         currentDoorPosition=position;
-        if (currentArmPosition == armPosition.PICKUP) {
+        if (roughTargetPosition == armPosition.PICKUP) {
             position = doorPosition.PICKUP;
         }
         if (position == doorPosition.CARRY) {
-            pickupDoor.setPosition(0.8);
+            pickupDoor.setPosition(0.71);
         }
         if (position == doorPosition.DUMP) {
             pickupDoor.setPosition(0);
