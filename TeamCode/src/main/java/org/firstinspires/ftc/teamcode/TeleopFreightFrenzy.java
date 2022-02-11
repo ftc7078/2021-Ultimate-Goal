@@ -19,6 +19,7 @@ public class TeleopFreightFrenzy extends LinearOpMode {
     private FFRobot robot = new FFRobot();
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
+    private double duckWheelSpeed=0;
 
     @Override
     public void runOpMode() {
@@ -55,7 +56,7 @@ public class TeleopFreightFrenzy extends LinearOpMode {
         while (opModeIsActive()) {
             double speed = 1;
 
-             speed = (gamepad1.right_trigger * 0.6) + 0.4;
+             speed = ( (gamepad1.right_trigger*gamepad1.right_trigger) * 0.7) + 0.3;
             double fwd = -addDeadZone(gamepad1.left_stick_y);
             double strafe = -addDeadZone(gamepad1.left_stick_x);
             double rot= addDeadZone(gamepad1.right_stick_x);
@@ -79,32 +80,45 @@ public class TeleopFreightFrenzy extends LinearOpMode {
                 robot.pickup(false);
             } else {
                 robot.pickup(false);
-                if (robot.currentArmPosition == armPosition.PICKUP) {
-                    robot.moveArm(armPosition.CARRY);
-                } else if (robot.currentArmPosition == armPosition.HIGH) {
+                if (robot.roughTargetPosition == armPosition.PICKUP) {
+                    //robot.moveArm(armPosition.CARRY);
+                    robot.moveArm(armPosition.CARRY, (int) (gamepad2.left_trigger*250) ) ;
+
+                } else if (robot.roughTargetPosition == armPosition.HIGH) {
                     robot.moveArm(armPosition.HIGH, (int) (gamepad2.left_trigger*250) ) ;
                 }
                 if (gamepad2.dpad_up) {
                     robot.setDoorPosition(doorPosition.CARRY);
-                    robot.moveArm(armPosition.HIGH);
+                    robot.moveArm(armPosition.HIGH, (int) (gamepad2.left_trigger*250) ) ;
                 } else if (gamepad2.dpad_down) {
                     robot.moveArm(armPosition.PICKUP);
                     robot.setDoorPosition(doorPosition.PICKUP);
                 } else if (gamepad2.dpad_left || gamepad2.dpad_right) {
                     robot.setDoorPosition(doorPosition.CARRY);
-                    robot.moveArm(armPosition.CARRY);
+                    robot.moveArm(armPosition.CARRY, (int) (gamepad2.left_trigger*250) ) ;
                 } else {
                     robot.setDoorPosition(doorPosition.CARRY);
+                    robot.moveArm(robot.roughTargetPosition, (int) (gamepad2.left_trigger*250) ) ;
+
                 }
             }
 
             if (gamepad2.left_bumper) {
-                robot.setDuckWheel(0.7);
+                duckWheelSpeed=duckWheelSpeed+0.1;
+                if (duckWheelSpeed > 1) {duckWheelSpeed = 1;}
+                robot.setDuckWheel(duckWheelSpeed);
             } else if(gamepad2.right_bumper) {
-                robot.setDuckWheel(-0.7);
+                duckWheelSpeed=duckWheelSpeed-0.1;
+                if (duckWheelSpeed < -1) {duckWheelSpeed = -1;}
+                robot.setDuckWheel(duckWheelSpeed);
+                robot.setDuckWheel(duckWheelSpeed);
             } else {
-                robot.setDuckWheel(0);
+                duckWheelSpeed=0;
+                robot.setDuckWheel(duckWheelSpeed);
             }
+
+
+            //robot.setDuckWheel(gamepad2.right_stick_x);
             //,.robot.setShippingElementPickupPosition(gamepad1.left_trigger);
             robot.setShippingElementPickupPosition(gamepad2.right_trigger);
 
