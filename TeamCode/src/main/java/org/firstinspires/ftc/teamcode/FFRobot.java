@@ -104,10 +104,18 @@ public class FFRobot {
         } else if (targetPosition == armPosition.PICKUP){
             arm.setTargetPosition(pickUp);
         }
-        if (arm.getCurrentPosition() > arm.getTargetPosition() ) {
-            arm.setPower(armPowerDown);
-        } else {
+        int armMoveDistance = arm.getTargetPosition() - arm.getCurrentPosition() ;
+        if (Math.abs(armMoveDistance) < 100 ) {
             arm.setPower(armPowerUp);
+        } else if (armMoveDistance < 0 ) {
+            //down
+            double power = (double) -armMoveDistance / (double) 1000 + 0.1;
+            arm.setPower(power);
+            //arm.setPower(armPowerDown);
+        } else {
+            double power = (double) -armMoveDistance / (double) 500 + 0.4;
+            arm.setPower(power);
+            //arm.setPower(armPowerUp);
         }
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
