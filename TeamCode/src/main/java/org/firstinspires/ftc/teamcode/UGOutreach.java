@@ -2,15 +2,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import static org.firstinspires.ftc.teamcode.UGRobotOutreach.pickupDirection;
+import static org.firstinspires.ftc.teamcode.UGRobotOutreach.shooterDirection;
 
 
-@TeleOp(name="UG Teleop", group="")
-@Disabled
-public class UGTeleop extends LinearOpMode {
+
+
+@TeleOp(name="Ring Shooter", group="Outreach")
+
+public class UGOutreach extends LinearOpMode {
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -25,7 +28,7 @@ public class UGTeleop extends LinearOpMode {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
-    private UGRobot robot = new UGRobot();
+    private UGRobotOutreach robot = new UGRobotOutreach();
 
     @Override
     public void runOpMode() {
@@ -63,14 +66,14 @@ public class UGTeleop extends LinearOpMode {
             boolean pull = gamepad2.x;
             boolean push = gamepad2.b;
             if (pull) {
-                robot.setPickup(UGRobot.pickupDirection.IN);
+                robot.setPickup(pickupDirection.IN);
                 telemetry.addData("Manipulator Motors", "Pulling");
             } else if (push) {
-                robot.setPickup(UGRobot.pickupDirection.OUT);
+                robot.setPickup(pickupDirection.OUT);
                 telemetry.addData("Manipulator Motors", "Pushing");
             } else {
                 telemetry.addData("Manipulator Motors", "Idle");
-                robot.setPickup(UGRobot.pickupDirection.STOP);
+                robot.setPickup(pickupDirection.STOP);
             }
 
 
@@ -94,7 +97,7 @@ public class UGTeleop extends LinearOpMode {
             if (gamepad2.start != isSpeedUpPressed) {
                 if (gamepad2.start) {
                     robot.setFlywheelPower(robot.getFlywheelPower()+0.02);
-                    robot.setFlywheel(UGRobot.shooterDirection.OUT);
+                    robot.setFlywheel(shooterDirection.OUT);
                 }
                 isSpeedUpPressed = gamepad2.start;
             }
@@ -102,38 +105,16 @@ public class UGTeleop extends LinearOpMode {
             if (gamepad2.back != isSpeedDownPressed) {
                 if (gamepad2.back) {
                     robot.setFlywheelPower(robot.getFlywheelPower()-0.02);
-                    robot.setFlywheel(UGRobot.shooterDirection.OUT);
+                    robot.setFlywheel(shooterDirection.OUT);
                 }
                 isSpeedDownPressed = gamepad2.back;
             }
 
-            if (gamepad2.dpad_up != isWobbleUpTriggered){
-                if (gamepad2.dpad_up){
-                    robot.moveWobbleArm(UGRobot.wobblePosition.UP);
-                }
-                isWobbleUpTriggered = gamepad2.dpad_up;
-            }
 
-            if (gamepad2.dpad_down != isWobbleDownTriggered){
-                if (gamepad2.dpad_down){
-                    robot.moveWobbleArm(UGRobot.wobblePosition.MID);
-                }
-                isWobbleDownTriggered = gamepad2.dpad_down;
-            }
 
-            if (gamepad2.dpad_right != isWobbleCloseTriggered){
-                if (gamepad2.dpad_right){
-                    robot.wobbleServo(true);
-                }
-                isWobbleCloseTriggered = gamepad2.dpad_right;
-            }
 
-            if (gamepad2.dpad_left != isWobbleOpenTriggered){
-                if (gamepad2.dpad_left){
-                    robot.wobbleServo(false);
-                }
-                isWobbleOpenTriggered = gamepad2.dpad_left;
-            }
+
+     
 
             mecanumDrive.tickSleep();
             robot.tick();
