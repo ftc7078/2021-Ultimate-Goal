@@ -16,9 +16,9 @@ public class FFRobot {
 
     private Telemetry telemetry;
     private LinearOpMode opMode;
-    private Servo shippingElementPickup;
-    Servo pickupDoor;
-    DcMotor pickup;
+    //private Servo shippingElementPickup;
+   // Servo pickupDoor;
+    //DcMotor pickup;
     public DcMotor arm;
     private DcMotor duckWheel;
     private int high = 1500;
@@ -59,15 +59,15 @@ public class FFRobot {
         telemetry = telemetryIn;
         opMode = opModeIn;
 
-        shippingElementPickup = hardwareMap.get(Servo.class, "shipping_element_pickup");
-        pickupDoor = hardwareMap.get(Servo.class, "pickup_door");
-        pickup = hardwareMap.get(DcMotor.class, "pickup");
+        //shippingElementPickup = hardwareMap.get(Servo.class, "shipping_element_pickup");
+        //pickupDoor = hardwareMap.get(Servo.class, "pickup_door");
+        //pickup = hardwareMap.get(DcMotor.class, "pickup");
         arm = hardwareMap.get(DcMotor.class, "arm");
         duckWheel = hardwareMap.get(DcMotor.class, "duck_wheel");
 
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        Log.d("FFRobot", "init: "+pickupDoor.getPosition());
+       // Log.d("FFRobot", "init: "+pickupDoor.getPosition());
 
 
 
@@ -90,7 +90,7 @@ public class FFRobot {
         this.setDoorPosition(doorPosition.CARRY);
         this.moveArm(armPosition.PICKUP);
 
-        pickup.setDirection(DcMotorSimple.Direction.REVERSE);
+        //pickup.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     public void moveArm (armPosition targetPosition) {
         moveArm(targetPosition, 0);
@@ -121,9 +121,9 @@ public class FFRobot {
     }
     public void pickup(boolean on) {
         if (on) {
-            pickup.setPower(0.7);
+           // pickup.setPower(0.7);
         } else {
-            pickup.setPower(0);
+            //pickup.setPower(0);
         }
     }
     public void setDuckWheel(double power){
@@ -135,16 +135,16 @@ public class FFRobot {
             position = doorPosition.PICKUP;
         }
         if (position == doorPosition.CARRY) {
-            pickupDoor.setPosition(0.71);
+            //pickupDoor.setPosition(0.71);
         }
         if (position == doorPosition.DUMP) {
-            pickupDoor.setPosition(0);
+            //pickupDoor.setPosition(0);
         }
         if (position == doorPosition.PICKUP) {
-            pickupDoor.setPosition(1);
+            //pickupDoor.setPosition(1);
         }
     }
     public void setShippingElementPickupPosition(double position){
-        shippingElementPickup.setPosition(position);
+        //shippingElementPickup.setPosition(position);
     }
 }

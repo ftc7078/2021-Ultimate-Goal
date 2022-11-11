@@ -158,11 +158,15 @@ public class MecanumDrive {
     int getCurrentPosition() {
         int position = 0;
         for (int i = 0; i < 4; i++) {
-            position += motors[i].getCurrentPosition();
+            position += motors[i].getCurrentPositionCached();
         }
         return ((int) (position / 4));
     }
 
+    void motorTelemetry() {
+        telemetry.addData("Encoders", "F:%7d:%7d R:%7d:%7d ", motors[FL].getCurrentPosition(), motors[FR].getCurrentPosition(), motors[BL].getCurrentPosition(), motors[BR].getCurrentPosition());
+
+    }
     void setMotors(double x, double y, double rot, double slowdownFactor) {
         double theta = Math.atan2(x, y) - Math.PI / 4;  //finds the angle of the joystick and turns it by pi/4 radians or 45 degrees
         rot = 1 * rot;  //scales rotation factor

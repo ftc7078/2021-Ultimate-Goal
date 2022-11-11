@@ -454,7 +454,8 @@ public class HPMC {
     public double getAccelleration()  { return accelleration; }
     public double getVelocitySoon()  { return velocitySoon; }
     public double getUpdatesPerSecond() { return updatesPerSecond;}
-    public int getCurrentPosition() { return currentPosition; }
+    public int getCurrentPositionCached() { return currentPosition; }
+    public int getCurrentPosition() { return motor.getCurrentPosition(); }
 
     public String getSMStatus() {
         return String.format("State: %s  Moved: %d Speed: %.2f  Desired: %.2f Power: %.2f StoppingAt: %d",

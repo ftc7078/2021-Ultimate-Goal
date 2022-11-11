@@ -52,6 +52,7 @@ public class JustMecanum extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
+        int j=100;
         while (opModeIsActive()) {
 
             double speed = 1;
@@ -71,24 +72,14 @@ public class JustMecanum extends LinearOpMode {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
 
-            boolean pull = gamepad2.x;
-            boolean push = gamepad2.b;
 
-            if (gamepad2.right_bumper) {
-                //mecanumDrive.setMotors(0,0,0,1);
-                sleep(100);
-                sleep(100);
-
-            } else {
-            }
-
-
-
-
-            mecanumDrive.tickSleep();
             telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
+            mecanumDrive.motorTelemetry();
 
+            j++;
+            telemetry.addData("Number:", "%d", j);
             telemetry.update();
+            mecanumDrive.tickSleep();
         }
 
     }
