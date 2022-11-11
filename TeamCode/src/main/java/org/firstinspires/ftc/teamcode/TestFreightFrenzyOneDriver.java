@@ -38,7 +38,7 @@ public class TestFreightFrenzyOneDriver extends LinearOpMode {
 
             telemetry.addData("Status", "Initialized");
             telemetry.addData("gp1lt", gamepad1.left_trigger);
-            telemetry.addData("Door Position", robot.pickupDoor.getPosition());
+           // telemetry.addData("Door Position", robot.pickupDoor.getPosition());
             //telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("Motor Power",robot.arm.getPower());
             telemetry.addData("Motor Position",robot.arm.getCurrentPosition());
