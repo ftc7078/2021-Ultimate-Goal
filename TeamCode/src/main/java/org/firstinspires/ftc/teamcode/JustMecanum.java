@@ -4,8 +4,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 
 @TeleOp(name="Test: Just Mecanum", group="Test")
 
@@ -36,6 +37,7 @@ public class JustMecanum extends LinearOpMode {
     @Override
     public void runOpMode() {
         mecanumDrive.init(hardwareMap, telemetry, this);
+        mecanumDrive.setMotorDirections(Direction.FORWARD, Direction.REVERSE, Direction.FORWARD, Direction.REVERSE);
 
 
         //capstone = hardwareMap.get(Servo.class, "capstone");
@@ -70,8 +72,25 @@ public class JustMecanum extends LinearOpMode {
                 strafe = -1;
             }
             rot = rot * speed;
-            mecanumDrive.setMotors(strafe,fwd,rot, 1);
 
+            if (gamepad1.a || gamepad1.b || gamepad1.x || gamepad1.y) {
+                if (gamepad1.a) {
+                    mecanumDrive.runMotors(0.5,0,0,0,false);
+                    telemetry.addData("Running", "Front Left");
+                } else if (gamepad1.b) {
+                    mecanumDrive.runMotors(0,0.5,0,0,false);
+                    telemetry.addData("Running", "Front Right");
+                } else if (gamepad1.x) {
+
+                    mecanumDrive.runMotors(0,0,0.5,0,false);
+                    telemetry.addData("Running", "Back Left");
+                } else if (gamepad1.y) {
+                    mecanumDrive.runMotors(0,0,0,0.5,false);
+                    telemetry.addData("Running", "Back Right");
+                }
+            } else {
+                mecanumDrive.setMotors(strafe, fwd, rot, 1);
+            }
 
             telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
             mecanumDrive.motorTelemetry();
