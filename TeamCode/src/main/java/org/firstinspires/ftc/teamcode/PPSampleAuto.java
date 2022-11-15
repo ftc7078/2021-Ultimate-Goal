@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous(name="PP Sample Auto", group ="Autonomous")
 
@@ -52,6 +53,8 @@ public class PPSampleAuto extends LinearOpMode {
     {
 
         mecanumDrive.init(hardwareMap, telemetry, this);
+        mecanumDrive.setMotorDirections(DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
+        mecanumDrive.setCountPerDegree(9);
         //robot.init(hardwareMap, telemetry, this);
         //This is Object Detection (OD)
         //OD.init(hardwareMap, telemetry,this);
@@ -64,11 +67,12 @@ public class PPSampleAuto extends LinearOpMode {
 
         waitForStart();
 
-        //mecanumDrive.arcMove(1,45,.5, MecanumDrive.MoveDirection.LEFT,true,true);
+        mecanumDrive.arcMove(1,45,.5, MecanumDrive.MoveDirection.LEFT,true,true);
+        mecanumDrive.forward(5,0.6);
         this.sleep(2000);
-        mecanumDrive.backward(9.5,.5);
-        mecanumDrive.turn(135,.5, MecanumDrive.MoveDirection.RIGHT);
-        mecanumDrive.forward(48,.5);
+        mecanumDrive.backward(6,.5);
+        mecanumDrive.turn(115,.5, MecanumDrive.MoveDirection.RIGHT);
+        mecanumDrive.forward(24,.5);
         mecanumDrive.turn(90,.5, MecanumDrive.MoveDirection.LEFT);
         mecanumDrive.forward(40.5,.5);
         this.sleep(2000);

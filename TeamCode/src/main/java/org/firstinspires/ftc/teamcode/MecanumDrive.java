@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -14,6 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
+
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +24,8 @@ import java.io.ObjectInputStream;
 
 import static java.lang.Math.sqrt;
 import static java.lang.Thread.sleep;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+
 
 public class MecanumDrive {
     private Telemetry telemetry;
@@ -44,7 +49,7 @@ public class MecanumDrive {
     private final double MOTOR_SPEED = 2800;
     private final long COUNT_PER_INCH = 40;
     private final long COUNT_PER_INCH_STRAFING = 60;
-    private final double COUNT_PER_DEGREE = 10;
+    public double countPerDegree = 10;
 
 
     private final int FL = 0;
@@ -84,10 +89,10 @@ public class MecanumDrive {
 
 
         // Reverse the motors that runs backwards when connected directly to the battery
-        motors[FL].setDirection(DcMotor.Direction.REVERSE);
-        motors[BL].setDirection(DcMotor.Direction.FORWARD);
-        motors[FR].setDirection(DcMotor.Direction.FORWARD);
-        motors[BR].setDirection(DcMotor.Direction.FORWARD);
+        motors[FL].setDirection(Direction.REVERSE);
+        motors[BL].setDirection(Direction.FORWARD);
+        motors[FR].setDirection(Direction.FORWARD);
+        motors[BR].setDirection(Direction.FORWARD);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -104,7 +109,15 @@ public class MecanumDrive {
 
     }
 
-
+    void setMotorDirections(DcMotorSimple.Direction front_left, DcMotorSimple.Direction front_right, DcMotorSimple.Direction back_left, DcMotorSimple.Direction back_right) {
+        motors[FL].setDirection(front_left);
+        motors[FR].setDirection(front_right);
+        motors[BL].setDirection(back_left);
+        motors[BR].setDirection(back_right);
+    }
+    void setCountPerDegree(double count) {
+        countPerDegree=count;
+    }
     boolean isReady() {
         if ( imu.isGyroCalibrated() || opMode.isStopRequested() ) {
             //orientationAtStart = getOrientation();
@@ -164,7 +177,7 @@ public class MecanumDrive {
     }
 
     void motorTelemetry() {
-        telemetry.addData("Encoders", "F:%7d:%7d R:%7d:%7d ", motors[FL].getCurrentPosition(), motors[FR].getCurrentPosition(), motors[BL].getCurrentPosition(), motors[BR].getCurrentPosition());
+        telemetry.addData("Encoders", "fl:%7d fr:%7d bl:%7d: br:%7d ", motors[FL].getCurrentPosition(), motors[FR].getCurrentPosition(), motors[BL].getCurrentPosition(), motors[BR].getCurrentPosition());
 
     }
     void setMotors(double x, double y, double rot, double slowdownFactor) {
@@ -249,7 +262,7 @@ public class MecanumDrive {
 
     void altTurn (double degrees, double power, MoveDirection direction) {
         setMotors( 0 , 0 , -1, power);
-        long distance = (long) (degrees * COUNT_PER_DEGREE);
+        long distance = (long) (degrees * countPerDegree);
         long start =  getCurrentPosition();
         while (Math.abs(start - getCurrentPosition()) < distance) {
             tickSleep();
@@ -260,7 +273,7 @@ public class MecanumDrive {
 
     void turn(double degrees, double power, MoveDirection direction) {
         if (!opMode.opModeIsActive()) {return;}
-        long distance = (long) (degrees * COUNT_PER_DEGREE);
+        long distance = (long) (degrees * countPerDegree);
         HPMC.Direction FL_Direction = HPMC.Direction.FORWARD;
         HPMC.Direction FR_Direction = HPMC.Direction.FORWARD;
         /*
