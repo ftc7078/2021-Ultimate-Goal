@@ -30,14 +30,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="PP Sample Auto", group ="Autonomous")
+@Autonomous(name="PoP Sample Auto", group ="Autonomous")
 
 
-public class PPSampleAuto extends LinearOpMode {
+public class PoPSampleAuto extends LinearOpMode {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -66,27 +65,36 @@ public class PPSampleAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
 
         waitForStart();
+        mecanumDrive.enableDebugWait();
 
-        mecanumDrive.arcMove(1,45,.5, MecanumDrive.MoveDirection.LEFT,true,true);
-        mecanumDrive.forward(5,0.6);
-        this.sleep(2000);
-        mecanumDrive.backward(6,.5);
-        mecanumDrive.turn(115,.5, MecanumDrive.MoveDirection.RIGHT);
-        mecanumDrive.forward(24,.5);
-        mecanumDrive.turn(90,.5, MecanumDrive.MoveDirection.LEFT);
-        mecanumDrive.forward(40.5,.5);
-        this.sleep(2000);
-        mecanumDrive.backward(4.5,.5);
-        mecanumDrive.turn(90,.5, MecanumDrive.MoveDirection.LEFT);
-        mecanumDrive.forward(4.5,.5,true);
-        this.sleep(2000);
-        mecanumDrive.backward(4.5,.5);
-        mecanumDrive.turn(90,.5, MecanumDrive.MoveDirection.RIGHT);
-        mecanumDrive.forward(4.5,.5,true);
-        this.sleep(2000);
-        mecanumDrive.backward(28.5,.5);
-        mecanumDrive.turn(90,.5, MecanumDrive.MoveDirection.LEFT);
-        this.sleep(2000);
+        mecanumDrive.forward(14,0.6);
+       mecanumDrive.forward(38,0.6);
+       mecanumDrive.rightTurn(90,0.6);
+       mecanumDrive.forward(24,0.6);
+       mecanumDrive.rightStrafe();
+
+
+        telemetry.addData("DebugWait", "Auto Done.  Drive me home.");
+        telemetry.update();
+        while (opModeIsActive()) {
+
+            double speed = 1;
+
+            speed = (gamepad1.right_trigger * 0.6) + 0.4;
+            double fwd = gamepad1.left_stick_y;
+            double strafe = gamepad1.left_stick_x;
+            double rot = gamepad1.right_stick_x;
+
+            fwd = fwd * speed;
+            strafe = strafe * speed * 1.6;
+            if (strafe > 1) {
+                strafe = 1;
+            } else if (strafe < -1) {
+                strafe = -1;
+            }
+            rot = rot * speed;
+            mecanumDrive.setMotors(strafe, fwd, rot, 1);
+        }
 
         /*  //START OF FFAuto
         // Auto Position 2 Fancy
