@@ -50,6 +50,7 @@ public class MecanumDrive {
     private final long COUNT_PER_INCH = 40;
     private final long COUNT_PER_INCH_STRAFING = 60;
     public double countPerDegree = 10;
+    public boolean debugMode = false;
 
 
     private final int FL = 0;
@@ -108,6 +109,7 @@ public class MecanumDrive {
 
 
     }
+
 
     void setMotorDirections(DcMotorSimple.Direction front_left, DcMotorSimple.Direction front_right, DcMotorSimple.Direction back_left, DcMotorSimple.Direction back_right) {
         motors[FL].setDirection(front_left);
@@ -271,7 +273,43 @@ public class MecanumDrive {
 
     }
 
+    void enableDebugWait(){
+        debugMode=true;
+    }
+
+    void waitIfDebugging() {
+        if (! debugMode) {
+            return;
+        };
+        while (!opMode.gamepad1.a && opMode.opModeIsActive()) {
+            opMode.telemetry.addData("DebugWait", "Waiting for A button");
+            opMode.telemetry.update();
+            double speed = 1;
+
+            speed = (opMode.gamepad1.right_trigger * 0.6) + 0.4;
+            double fwd = opMode.gamepad1.left_stick_y;
+            double strafe = opMode.gamepad1.left_stick_x;
+            double rot = opMode.gamepad1.right_stick_x;
+
+            fwd = fwd * speed;
+            strafe = strafe * speed * 1.6;
+            if (strafe > 1) {
+                strafe = 1;
+            } else if (strafe < -1) {
+                strafe = -1;
+            }
+            rot = rot * speed;
+            this.setMotors(strafe, fwd, rot, 1);
+            opMode.sleep(20);
+        }
+        opMode.telemetry.addData("DebugWait", "Running");
+        opMode.telemetry.update();
+
+
+    }
+
     void turn(double degrees, double power, MoveDirection direction) {
+        waitIfDebugging();
         if (!opMode.opModeIsActive()) {return;}
         long distance = (long) (degrees * countPerDegree);
         HPMC.Direction FL_Direction = HPMC.Direction.FORWARD;
@@ -310,6 +348,8 @@ public class MecanumDrive {
     }
 
     void move(double inches, double power, MoveDirection direction, boolean endStopped) {
+        waitIfDebugging();
+
         if (!opMode.opModeIsActive()) {return;}
         long distance = 0;
         if (inches < 0) {
@@ -360,6 +400,8 @@ public class MecanumDrive {
     }
 
     void diagonal (double inches, double power, MoveDirection leftRight, boolean endStopped) {
+        waitIfDebugging();
+
         if ((inches < 0) || (power < 0)) {
             inches = 0 - Math.abs(inches);
             power = Math.abs(power);
@@ -500,6 +542,8 @@ public class MecanumDrive {
 
 
     void arcMove( double radius, double degrees, double speed, MoveDirection direction, boolean pivotFront,  boolean endStopped) {
+        waitIfDebugging();
+
         //wheels a b c and d.
         if (!opMode.opModeIsActive()) {return;}
         final double wheelSpacingFrontToBack = 10;
