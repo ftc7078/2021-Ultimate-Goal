@@ -71,7 +71,7 @@ public class PoPSampleAuto extends LinearOpMode {
        mecanumDrive.forward(38,0.6);
        mecanumDrive.rightTurn(90,0.6);
        mecanumDrive.forward(24,0.6);
-       mecanumDrive.rightStrafe();
+       //mecanumDrive.rightStrafe();
 
 
         telemetry.addData("DebugWait", "Auto Done.  Drive me home.");
