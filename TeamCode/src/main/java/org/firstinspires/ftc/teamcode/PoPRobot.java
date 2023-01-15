@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -34,19 +36,8 @@ import java.util.ArrayList;
  */
 
 
-        import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-        import org.openftc.apriltag.AprilTagDetection;
-        import org.openftc.easyopencv.OpenCvCamera;
-        import org.openftc.easyopencv.OpenCvCameraFactory;
-        import org.openftc.easyopencv.OpenCvCameraRotation;
-        import org.openftc.easyopencv.OpenCvInternalCamera;
-        import org.openftc.easyopencv.OpenCvInternalCamera2;
-
-        import java.util.ArrayList;
 
 public class PoPRobot {
     OpenCvCamera camera;
@@ -73,6 +64,7 @@ public class PoPRobot {
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
+    private DcMotorEx turret =null;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
         telemetry = telemetryIn;
@@ -89,10 +81,20 @@ public class PoPRobot {
             public void onError(int errorCode) {
             }
         });
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
     }
-
+    public void setMotorDirections (MecanumDrive mecanumDrive) {
+        mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
+    }
+    void setTurretPower(double turretPowerIn){
+        turret.setPower(turretPowerIn);
+    }
     void stopVision() {
-        camera.stopStreaming();
+        try {
+            camera.stopStreaming();
+        } catch(Exception e) {
+
+        }
     }
 
     int getSleevePosition () {

@@ -2,6 +2,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -98,6 +101,9 @@ public class UGRobot implements MecanumDrive.TickCallback {
         }
         wobbleArmMotor.setPower(0);
         wobbleArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void setMotorDirections (MecanumDrive mecanumDrive) {
+        mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
     }
 
     public void tick () {

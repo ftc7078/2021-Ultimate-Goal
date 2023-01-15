@@ -30,15 +30,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@Autonomous(name="PoPAuto", group ="Autonomous")
+@TeleOp(name="PoPTeleOp", group ="TeleOp")
 
-public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
+public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -76,43 +73,7 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
         //START OF FFAuto
     // Auto Position 2 Fancy
 
-        //dump
-        mecanumDrive.backward(5,.5);
-        mecanumDrive.rightTurn(45,.5);
-        mecanumDrive.backward(24,.5);
-        //robot.setDoorPosition(FFRobot.doorPosition.DUMP);
-        sleep(500);
 
-        //duck wheel
-        mecanumDrive.forward(6,.5);
-        mecanumDrive.rightTurn(90,.5);
-        mecanumDrive.forward(48,.5);
-
-        for (int i=1; i<10; i++) {
-            //robot.setDuckWheel(0.1*i);
-            sleep(50);
-        }
-        //r//obot.setDuckWheel(1);
-        sleep(3000);
-        //robot.setDuckWheel(0);
-
-        //pickup
-        mecanumDrive.backward(6,.5);
-        mecanumDrive.rightTurn(135,.5);
-        mecanumDrive.forward(96,.5);
-        //robot.pickup(true);
-        mecanumDrive.forward(5,.5);
-        //robot.pickup(false);
-
-        //dump
-        mecanumDrive.leftTurn(45,.5);
-        mecanumDrive.backward(48,.5);
-        //robot.setDoorPosition(FFRobot.doorPosition.DUMP);
-        mecanumDrive.forward(48,.5);
-
-        //Drive back - comment out for competition
-        //robot.moveArm(FFRobot.armPosition.PICKUP);
-        sleep(300);
         //robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
         while (opModeIsActive()) {
             double speed = 1;
@@ -121,6 +82,7 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
             double fwd = addDeadZone(gamepad1.left_stick_y);
             double strafe = addDeadZone(gamepad1.left_stick_x);
             double rot= addDeadZone(gamepad1.right_stick_x);
+            robot.setTurretPower(gamepad1.right_stick_x * 0.3);
 
             fwd = fwd * speed;
             strafe =strafe * speed * 1.6;

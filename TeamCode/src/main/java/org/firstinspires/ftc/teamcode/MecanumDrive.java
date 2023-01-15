@@ -47,9 +47,24 @@ public class MecanumDrive {
     private double[] power = new double[4];
     private long[] startingPositions = new long[4];
     private final double MOTOR_SPEED = 2800;
-    private final long COUNT_PER_INCH = 40;
-    private final long COUNT_PER_INCH_STRAFING = 60;
-    public double countPerDegree = 10;
+
+
+
+    private long countPerInch = 40;
+    private long countPerInchStrafing = 60;
+
+    public long getCountPerInch() {
+        return countPerInch;
+    }
+
+    public double getCountPerDegree() {
+        return countPerDegree;
+    }
+    public void setCountPerInch(long countPerInch) {
+        this.countPerInch = countPerInch;
+    }
+    
+    public double countPerDegree = 8.9;
     public boolean debugMode = false;
 
 
@@ -57,6 +72,8 @@ public class MecanumDrive {
     private final int FR = 2;
     private final int BL = 1;
     private final int BR = 3;
+
+
 
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
@@ -281,7 +298,7 @@ public class MecanumDrive {
         if (! debugMode) {
             return;
         };
-        while (!opMode.gamepad1.a && opMode.opModeIsActive()) {
+        while (debugMode && !opMode.gamepad1.a && opMode.opModeIsActive()) {
             opMode.telemetry.addData("DebugWait", "Waiting for A button");
             opMode.telemetry.update();
             double speed = 1;
@@ -300,7 +317,12 @@ public class MecanumDrive {
             }
             rot = rot * speed;
             this.setMotors(strafe, fwd, rot, 1);
+            if ( callback != null) {
+                callback.tickCallback();
+            }
             opMode.sleep(20);
+
+
         }
         opMode.telemetry.addData("DebugWait", "Running");
         opMode.telemetry.update();
@@ -358,7 +380,7 @@ public class MecanumDrive {
         switch (direction) {
             case FORWARD:
             case BACKWARD:
-                distance = (long) inches * COUNT_PER_INCH;
+                distance = (long) inches * countPerInch;
                 HPMC.Direction motorDirection = HPMC.Direction.FORWARD;
                 if (direction == MoveDirection.BACKWARD) {
                     motorDirection = HPMC.Direction.REVERSE;
@@ -369,7 +391,7 @@ public class MecanumDrive {
                 break;
             case LEFT:
             case RIGHT:
-                distance = (long) inches * COUNT_PER_INCH_STRAFING;
+                distance = (long) inches * countPerInchStrafing;
                 HPMC.Direction FL_Direction = HPMC.Direction.FORWARD;
                 HPMC.Direction FR_Direction = HPMC.Direction.FORWARD;
                 if (direction == MoveDirection.LEFT) {
@@ -406,7 +428,7 @@ public class MecanumDrive {
             inches = 0 - Math.abs(inches);
             power = Math.abs(power);
         }
-        long distance = (long) (inches * COUNT_PER_INCH * 1.4);
+        long distance = (long) (inches * countPerInch * 1.4);
 
         if (leftRight == MoveDirection.LEFT) {
             motors[FL].smoothMoveSetup(distance, power, 4, 4, HPMC.Direction.FORWARD, true);
@@ -496,7 +518,6 @@ public class MecanumDrive {
 
                 }
             }
-            //System.out.println("All Done: " + done);
             tickSleep();
 
         }
@@ -574,7 +595,7 @@ public class MecanumDrive {
 
 
 
-        double arkDistanceMultiplyer = (2 * Math.PI * degrees * COUNT_PER_INCH) / 360;
+        double arkDistanceMultiplyer = (2 * Math.PI * degrees * countPerInch) / 360;
         if (pivotFront) {
             switch (direction) {
                 case LEFT:
@@ -657,7 +678,7 @@ public class MecanumDrive {
 
 
 
-        double arkDistanceMultiplyer = (2 * Math.PI * degrees * COUNT_PER_INCH) / 360;
+        double arkDistanceMultiplyer = (2 * Math.PI * degrees * countPerInch) / 360;
         if (pivotFront) {
             switch (direction) {
                 case LEFT:
@@ -791,7 +812,7 @@ public class MecanumDrive {
         double distance=0;
         if (angle < 15) {
             distance = 0.225*angle;
-            System.out.println(String.format("Turning to: %.1f  from: %.1f Distance %.3f", degreesFromStart, currentOrientation.firstAngle,  distance * COUNT_PER_INCH));
+            System.out.println(String.format("Turning to: %.1f  from: %.1f Distance %.3f", degreesFromStart, currentOrientation.firstAngle,  distance * countPerInch));
 
         }
 
@@ -910,7 +931,7 @@ public class MecanumDrive {
     }
 
     double getMovedDistanceInches() {
-        return (getMovedDistanceCounts() / 4.0 / (double) COUNT_PER_INCH);
+        return (getMovedDistanceCounts() / 4.0 / (double) countPerInch);
     }
 
     void freeWheel( double frontLeft, double frontRight, double backLeft, double backRight, double distanceToMove) {
@@ -929,6 +950,7 @@ public class MecanumDrive {
     void stop () {
         for (HPMC motor: motors) {
             motor.setPowerManual(0);
+
         }
     }
 }

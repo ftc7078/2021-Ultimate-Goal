@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="Mecanum Test 2", group ="Tests")
 
-public class MecanumTest2 extends LinearOpMode {
+public class MecanumTest2 extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private ElapsedTime runtime = new ElapsedTime();
@@ -74,6 +74,7 @@ public class MecanumTest2 extends LinearOpMode {
         mecanumDrive.init(hardwareMap, telemetry, this);
         mecanumDrive.setMotorDirections(DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
         mecanumDrive.setCountPerDegree(9);
+        mecanumDrive.setupTickCallback(this);
 
 
         // Tell the driver that initialization is complete.
@@ -132,5 +133,16 @@ public class MecanumTest2 extends LinearOpMode {
         telemetry.addData("Status", string);
         telemetry.update();
     }
+
+    public void tickCallback() {
+        if (gamepad1.b) {
+            mecanumDrive.debugMode = true;
+        } else if (gamepad1.x) {
+            mecanumDrive.debugMode = false;
+        }
+        telemetry.addData("debugMode", mecanumDrive.debugMode );
+        telemetry.update();
+    }
+
 }
 

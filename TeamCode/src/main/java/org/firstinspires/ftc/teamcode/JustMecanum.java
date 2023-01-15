@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 @TeleOp(name="Test: Just Mecanum", group="Test")
 
@@ -37,7 +39,7 @@ public class JustMecanum extends LinearOpMode {
     @Override
     public void runOpMode() {
         mecanumDrive.init(hardwareMap, telemetry, this);
-        mecanumDrive.setMotorDirections(Direction.FORWARD, Direction.REVERSE, Direction.FORWARD, Direction.REVERSE);
+        mecanumDrive.setMotorDirections(FORWARD, REVERSE, REVERSE, FORWARD);
 
 
         //capstone = hardwareMap.get(Servo.class, "capstone");
@@ -72,20 +74,24 @@ public class JustMecanum extends LinearOpMode {
                 strafe = -1;
             }
             rot = rot * speed;
-
+            if (gamepad1.right_bumper) {
+                speed = -0.5;
+            } else {
+                speed = 0.5;
+            }
             if (gamepad1.a || gamepad1.b || gamepad1.x || gamepad1.y) {
                 if (gamepad1.a) {
-                    mecanumDrive.runMotors(0.5,0,0,0,false);
+                    mecanumDrive.runMotors(speed,0,0,0,false);
                     telemetry.addData("Running", "Front Left");
                 } else if (gamepad1.b) {
-                    mecanumDrive.runMotors(0,0.5,0,0,false);
+                    mecanumDrive.runMotors(0,speed,0,0,false);
                     telemetry.addData("Running", "Front Right");
                 } else if (gamepad1.x) {
 
-                    mecanumDrive.runMotors(0,0,0.5,0,false);
+                    mecanumDrive.runMotors(0,0,speed,0,false);
                     telemetry.addData("Running", "Back Left");
                 } else if (gamepad1.y) {
-                    mecanumDrive.runMotors(0,0,0,0.5,false);
+                    mecanumDrive.runMotors(0,0,0,speed,false);
                     telemetry.addData("Running", "Back Right");
                 }
             } else {
