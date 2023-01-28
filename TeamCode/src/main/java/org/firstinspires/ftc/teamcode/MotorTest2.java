@@ -68,7 +68,7 @@ public class MotorTest2 extends LinearOpMode {
         // Change the text in quotes to match any motor name on your robot.
         motor = hardwareMap.get(DcMotor.class, "MotorOne");
 
-        // Wait for the start button
+        // Wait for the start buttonPOI98
         telemetry.addData(">", "Press Start to run Motors." );
         telemetry.update();
         waitForStart();

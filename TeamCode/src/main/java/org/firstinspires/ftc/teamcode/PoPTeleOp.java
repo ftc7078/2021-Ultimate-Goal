@@ -37,19 +37,24 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback {
 
+    private final int ELEVATOR_UP_POSITION = 4000;
+    private final int ELEVATOR_DOWN_POSITION = 0;
+
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
 
     private PoPRobot robot = new PoPRobot();
+    private boolean turretIsMoving = false;
+    private int turretStart;
+    private boolean isElevatorUp = false;
+    private boolean wasXPressed = false;
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
 
 
-
-
-    @Override public void runOpMode()
-    {
+    @Override
+    public void runOpMode() {
 
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap, telemetry, this);
@@ -59,42 +64,121 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
         //This is Object Detection (OD)
         //OD.init(hardwareMap, telemetry,this);
         //mecanumDrive.setupTickCallback(robot);
-        //robot.multishotDelay = 225;
+        //robot.multishotDelay = 225;+
 
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-        while (!isStarted() ) {
+        while (!isStarted()) {
             robot.getSleevePosition();
             sleep(50);
         }
         waitForStart();
         robot.stopVision();
         //START OF FFAuto
-    // Auto Position 2 Fancy
+        // Auto Position 2 Fancy
 
 
         //robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
         while (opModeIsActive()) {
-            double speed = 1;
 
+            //MANIPULATOR
+            /*
+            if (turretIsMoving){
+              if (Math.abs(robot.getTurretPosition()-turretStart) > 6000){
+                turretIsMoving = false;
+                  robot.setTurretPower(0);
+              }
+
+            } else if (gamepad2.dpad_left){
+                robot.setTurretPower(-1);
+                turretIsMoving = true;
+                turretStart = robot.getTurretPosition();
+
+            } else if (gamepad2.dpad_right){
+                robot.setTurretPower(1);
+                turretIsMoving = true;
+                turretStart = robot.getTurretPosition();
+            } else {
+                robot.setTurretPower(gamepad2.left_stick_x * 0.6);
+            }
+            */
+            if (turretIsMoving) {
+                telemetry.addData("turret left", robot.turretLeftToDestination());
+                if (robot.isTurretAtDestination() || gamepad2.back) {
+                    turretIsMoving = false;
+                    robot.turretFreeMoveMode();
+                } else {
+                    //do nothing.  the motor will auto-set its own speed
+                }
+            } else if (gamepad2.dpad_right) {
+                robot.turnTurretTo(45);
+                turretIsMoving = true;
+            } else if (gamepad2.dpad_left) {
+                robot.turnTurretTo(-45);
+                turretIsMoving = true;
+            } else if (gamepad2.dpad_up) {
+                robot.turnTurretTo(135);
+                turretIsMoving = true;
+            } else if (gamepad2.dpad_down) {
+                robot.turnTurretTo(-135);
+                turretIsMoving = true;
+            } else {
+                robot.setTurretPower(gamepad2.left_stick_x * 0.6);
+            }
+
+
+            if (gamepad2.a) {
+                robot.turnArmTo(250);
+                robot.setWrist(1);
+            } else if (gamepad2.b) {
+                robot.turnArmTo(180);
+                robot.setWrist(0.5);
+            } else if (gamepad2.y) {
+                robot.turnArmTo(90);
+                robot.setWrist(0);
+            } else if (gamepad2.start) {
+                robot.turnArmTo(0);
+            }
+            if (gamepad2.x && wasXPressed == false) {
+                if (isElevatorUp) {
+                    isElevatorUp = false;
+                    robot.setElevatorPosition(ELEVATOR_DOWN_POSITION);
+                } else {
+                    isElevatorUp = true;
+                    robot.setElevatorPosition(ELEVATOR_UP_POSITION);
+                }
+            }
+            wasXPressed = gamepad2.x;
+            telemetry.addData("Turret Position", robot.getTurretPosition());
+            telemetry.addData("Arm Position", robot.getArmPosition());
+            telemetry.addData("Elevator Position", robot.getElevatorPosition());
+            telemetry.addData("isElevatorUp", isElevatorUp);
+
+            if (gamepad2.right_bumper || gamepad2.left_bumper) {
+                robot.clawGrab();
+            } else {
+                robot.setClawPosition(gamepad2.right_trigger + gamepad2.left_trigger);
+
+            }
+            telemetry.update();
+
+            //DRIVER
+            double speed = 1;
             speed = (gamepad1.right_trigger * 0.5) + 0.5;
             double fwd = addDeadZone(gamepad1.left_stick_y);
             double strafe = addDeadZone(gamepad1.left_stick_x);
-            double rot= addDeadZone(gamepad1.right_stick_x);
-            robot.setTurretPower(gamepad1.right_stick_x * 0.3);
-
+            double rot = addDeadZone(gamepad1.right_stick_x);
             fwd = fwd * speed;
-            strafe =strafe * speed * 1.6;
+            strafe = strafe * speed * 1.6;
             if (strafe > 1) {
                 strafe = 1;
             } else if (strafe < -1) {
                 strafe = -1;
             }
             rot = rot * speed;
-            mecanumDrive.setMotors(strafe,fwd,rot, 1);
+            mecanumDrive.setMotors(strafe, fwd, rot, 1);
         }
-
 
     }
 

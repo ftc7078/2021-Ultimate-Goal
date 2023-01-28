@@ -36,8 +36,10 @@ import java.util.ArrayList;
  */
 
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class PoPRobot {
     OpenCvCamera camera;
@@ -64,7 +66,19 @@ public class PoPRobot {
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
+    final int TURRET_COUNT_PER_DEGREE = 135;
+    final int TURN_LIMIT = TURRET_COUNT_PER_DEGREE * 180;
+    final double ARM_COUNT_PER_DEGREE = 4200 / 360;
+    final double CLAW_CLOSED = 1;
+    final double CLAW_OPEN = 0;
+    final int ELEVATOR_TOLERANCE = 10;
+
     private DcMotorEx turret =null;
+    private DcMotorEx arm =null;
+    private Servo claw =null;
+    private DcMotorEx elevator =null;
+    private Servo wrist =null;
+
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
         telemetry = telemetryIn;
@@ -82,22 +96,118 @@ public class PoPRobot {
             }
         });
         turret = hardwareMap.get(DcMotorEx.class, "turret");
+        arm = hardwareMap.get(DcMotorEx.class, "arm");
+        claw = hardwareMap.get(Servo.class, "claw");
+        elevator = hardwareMap.get(DcMotorEx.class, "elevator");
+        wrist = hardwareMap.get(Servo.class, "wrist");
     }
+
+    public int getArmPosition(){
+        return arm.getCurrentPosition();
+    }
+
     public void setMotorDirections (MecanumDrive mecanumDrive) {
         mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
     }
-    void setTurretPower(double turretPowerIn){
+
+    public void setTurretPower(double turretPowerIn){
         turret.setPower(turretPowerIn);
     }
-    void stopVision() {
+
+    public int getTurretPosition(){
+        return turret.getCurrentPosition();
+    }
+
+
+    public void turnTurret(double degrees){
+        int destination = getTurretPosition() + (int) (degrees * TURRET_COUNT_PER_DEGREE);
+        if (destination < -TURN_LIMIT) {
+            destination = -TURN_LIMIT;
+        } else if (destination > TURN_LIMIT) {
+            destination = TURN_LIMIT;
+        }
+        turret.setTargetPositionTolerance(TURRET_COUNT_PER_DEGREE);
+        turret.setTargetPosition(destination);
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(0.8);
+    }
+
+
+    public void turnTurretTo(double degrees){
+        if (degrees > 180) {
+            degrees = 180;
+        } else if (degrees < -180) {
+            degrees = -180;
+        }
+        int destination = (int) (TURRET_COUNT_PER_DEGREE * degrees);
+        turret.setTargetPositionTolerance(TURRET_COUNT_PER_DEGREE);
+        turret.setTargetPosition(destination);
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(0.8);
+    }
+
+    public boolean isTurretAtDestination() {
+        return (Math.abs(turret.getCurrentPosition() - turret.getTargetPosition()) < TURRET_COUNT_PER_DEGREE);
+    }
+    public int turretLeftToDestination() {
+        return (turret.getCurrentPosition() - turret.getTargetPosition());
+    }
+    public void turretFreeMoveMode() {
+        turret.setPower(0);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void turnArmTo (double degrees){
+        if (degrees > 250) {
+            degrees = 250;
+        } else if (degrees < 0) {
+            degrees = 0;
+        }
+        int destination = (int) (ARM_COUNT_PER_DEGREE * degrees);
+        arm.setTargetPositionTolerance((int) ARM_COUNT_PER_DEGREE);
+        arm.setTargetPosition(destination);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(0.8);
+    }
+    public void setWrist (double position){
+        wrist.setPosition(position);
+    }
+    public boolean isArmAtDestination() {
+        return (Math.abs(arm.getCurrentPosition() - arm.getTargetPosition()) < ARM_COUNT_PER_DEGREE);
+    }
+
+    public void clawGrab(){
+        claw.setPosition(CLAW_CLOSED);
+    }
+
+    public void clawRelease(){
+        claw.setPosition(CLAW_OPEN);
+    }
+
+    public void setClawPosition(double position) {
+        claw.setPosition(position);
+    }
+
+
+    public void setElevatorPosition(int destination) {
+        elevator.setTargetPositionTolerance(ELEVATOR_TOLERANCE);
+        elevator.setTargetPosition(destination);
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elevator.setPower(0.8);
+    }
+
+    public int getElevatorPosition() {
+        return elevator.getTargetPosition();
+    }
+    public void stopVision() {
         try {
             camera.stopStreaming();
         } catch(Exception e) {
-
+            //ignore
         }
     }
 
-    int getSleevePosition () {
+    public int getSleevePosition () {
             AprilTagDetection bestTag = null;
             double bestTagRating = 0;
             // Calling getDetectionsUpdate() will only return an object if there was a new frame

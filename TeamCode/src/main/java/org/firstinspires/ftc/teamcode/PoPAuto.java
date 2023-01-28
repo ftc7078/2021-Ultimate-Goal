@@ -30,11 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 @Autonomous(name="PoPAuto", group ="Autonomous")
 
@@ -44,15 +40,18 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
     private MecanumDrive mecanumDrive = new MecanumDrive();
 
     private PoPRobot robot = new PoPRobot();
+    private int sleeveCode;
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
+    private enum ScoringDirection {SCORE_LEFT, SCORE_RIGHT};
+    private ScoringDirection scoringDirection = ScoringDirection.SCORE_LEFT;
+    private int path = 0;
 
 
 
 
-    @Override public void runOpMode()
-    {
+    @Override public void runOpMode() {
 
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap, telemetry, this);
@@ -68,52 +67,30 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
         while (!isStarted() ) {
-            robot.getSleevePosition();
+
             sleep(50);
+            sleeveCode = robot.getSleevePosition();
+
         }
         waitForStart();
         robot.stopVision();
-        //START OF FFAuto
-    // Auto Position 2 Fancy
-
-        //dump
-        mecanumDrive.backward(5,.5);
-        mecanumDrive.rightTurn(45,.5);
-        mecanumDrive.backward(24,.5);
-        //robot.setDoorPosition(FFRobot.doorPosition.DUMP);
-        sleep(500);
-
-        //duck wheel
-        mecanumDrive.forward(6,.5);
-        mecanumDrive.rightTurn(90,.5);
-        mecanumDrive.forward(48,.5);
-
-        for (int i=1; i<10; i++) {
-            //robot.setDuckWheel(0.1*i);
-            sleep(50);
+        if (sleeveCode > 3) {
+            scoringDirection = ScoringDirection.SCORE_RIGHT;
+            path = sleeveCode -3;
+        } else {
+            scoringDirection = ScoringDirection.SCORE_LEFT;
+            path = sleeveCode;
         }
-        //r//obot.setDuckWheel(1);
-        sleep(3000);
-        //robot.setDuckWheel(0);
 
-        //pickup
-        mecanumDrive.backward(6,.5);
-        mecanumDrive.rightTurn(135,.5);
-        mecanumDrive.forward(96,.5);
-        //robot.pickup(true);
-        mecanumDrive.forward(5,.5);
-        //robot.pickup(false);
+        mecanumDrive.forward(24,0.5);
+        if (path == 1) {
+            mecanumDrive.leftTurn(90,0.5);
+            mecanumDrive.forward(24,0.5);
+        } else if (path == 3){
+            mecanumDrive.rightTurn(90, 0.5);
+            mecanumDrive.forward(24, 0.5);
+        }
 
-        //dump
-        mecanumDrive.leftTurn(45,.5);
-        mecanumDrive.backward(48,.5);
-        //robot.setDoorPosition(FFRobot.doorPosition.DUMP);
-        mecanumDrive.forward(48,.5);
-
-        //Drive back - comment out for competition
-        //robot.moveArm(FFRobot.armPosition.PICKUP);
-        sleep(300);
-        //robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
         while (opModeIsActive()) {
             double speed = 1;
 
@@ -132,8 +109,6 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
         }
-
-
     }
 
     public void tickCallback() {
