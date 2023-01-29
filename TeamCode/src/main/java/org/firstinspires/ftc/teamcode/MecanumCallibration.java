@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Mecanum Callibration", group="Test")
+@TeleOp(name="Test: Mecanum Callibration", group="Test")
 
 public class MecanumCallibration extends LinearOpMode {
 

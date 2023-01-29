@@ -29,16 +29,20 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @TeleOp(name="PoPTeleOp", group ="TeleOp")
 
 public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback {
 
-    private final int ELEVATOR_UP_POSITION = 4000;
-    private final int ELEVATOR_DOWN_POSITION = 0;
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -48,6 +52,8 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
     private int turretStart;
     private boolean isElevatorUp = false;
     private boolean wasXPressed = false;
+    private boolean elevatorDirectControl = true;
+
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
@@ -55,11 +61,13 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
 
     @Override
     public void runOpMode() {
-
-        mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap, telemetry, this);
-        mecanumDrive.setupTickCallback(this);
+        mecanumDrive.init(hardwareMap, telemetry, this);
         robot.setMotorDirections(mecanumDrive);
+        mecanumDrive.setupTickCallback(this);
+
+
+
         //mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
         //This is Object Detection (OD)
         //OD.init(hardwareMap, telemetry,this);
@@ -69,6 +77,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
+
         while (!isStarted()) {
             robot.getSleevePosition();
             sleep(50);
@@ -84,30 +93,10 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
 
             //MANIPULATOR
             /*
-            if (turretIsMoving){
-              if (Math.abs(robot.getTurretPosition()-turretStart) > 6000){
-                turretIsMoving = false;
-                  robot.setTurretPower(0);
-              }
-
-            } else if (gamepad2.dpad_left){
-                robot.setTurretPower(-1);
-                turretIsMoving = true;
-                turretStart = robot.getTurretPosition();
-
-            } else if (gamepad2.dpad_right){
-                robot.setTurretPower(1);
-                turretIsMoving = true;
-                turretStart = robot.getTurretPosition();
-            } else {
-                robot.setTurretPower(gamepad2.left_stick_x * 0.6);
-            }
-            */
             if (turretIsMoving) {
-                telemetry.addData("turret left", robot.turretLeftToDestination());
-                if (robot.isTurretAtDestination() || gamepad2.back) {
+                if (robot.turretStillMoving() || gamepad2.back) {
                     turretIsMoving = false;
-                    robot.turretFreeMoveMode();
+                    //robot.turretFreeMoveMode();
                 } else {
                     //do nothing.  the motor will auto-set its own speed
                 }
@@ -124,32 +113,47 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
                 robot.turnTurretTo(-135);
                 turretIsMoving = true;
             } else {
-                robot.setTurretPower(gamepad2.left_stick_x * 0.6);
-            }
+                robot.setTurretPower(gamepad2.left_stick_x );
+            }*/
+            robot.setTurretPower(gamepad2.left_stick_x );
+
+            telemetry.addData("turretIsMoving", turretIsMoving);
+            telemetry.addData("turretPosition", robot.getTurretPosition());
+            telemetry.addData("turretPower", robot.turret.getPower());
+
 
 
             if (gamepad2.a) {
                 robot.turnArmTo(250);
                 robot.setWrist(1);
+            } else if (gamepad2.x) {
+                robot.turnArmTo(120);
+                robot.setWrist(0.5);
             } else if (gamepad2.b) {
-                robot.turnArmTo(180);
+                robot.turnArmTo(155);
                 robot.setWrist(0.5);
             } else if (gamepad2.y) {
                 robot.turnArmTo(90);
                 robot.setWrist(0);
             } else if (gamepad2.start) {
                 robot.turnArmTo(0);
+                robot.setWrist(0);
             }
-            if (gamepad2.x && wasXPressed == false) {
-                if (isElevatorUp) {
-                    isElevatorUp = false;
-                    robot.setElevatorPosition(ELEVATOR_DOWN_POSITION);
-                } else {
-                    isElevatorUp = true;
-                    robot.setElevatorPosition(ELEVATOR_UP_POSITION);
+            if (elevatorDirectControl) {
+                robot.setElevatorPower(-gamepad2.right_stick_y);
+                telemetry.addData("elevator power", -gamepad2.right_stick_y);
+            } else {
+                if (gamepad2.x && wasXPressed == false) {
+                    if (isElevatorUp) {
+                        isElevatorUp = false;
+                        robot.setElevatorUp();
+                    } else {
+                        isElevatorUp = true;
+                        robot.setElevatorDown();
+                    }
                 }
+                wasXPressed = gamepad2.x;
             }
-            wasXPressed = gamepad2.x;
             telemetry.addData("Turret Position", robot.getTurretPosition());
             telemetry.addData("Arm Position", robot.getArmPosition());
             telemetry.addData("Elevator Position", robot.getElevatorPosition());
@@ -158,9 +162,10 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
             if (gamepad2.right_bumper || gamepad2.left_bumper) {
                 robot.clawGrab();
             } else {
-                robot.setClawPosition(gamepad2.right_trigger + gamepad2.left_trigger);
+                robot.setClawPosition(gamepad2.left_trigger);
 
             }
+            robot.setWristOffset(gamepad2.right_trigger/3);
             telemetry.update();
 
             //DRIVER

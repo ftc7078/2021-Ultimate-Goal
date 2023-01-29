@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -38,6 +39,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @Autonomous(name="Mecanum Test 2", group ="Tests")
+@Disabled
+
 
 public class MecanumTest2 extends LinearOpMode implements MecanumDrive.TickCallback {
 

@@ -29,11 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import static org.firstinspires.ftc.teamcode.MecanumDrive.MoveDirection.*;
 import static org.firstinspires.ftc.teamcode.UGObjectDetector.ringStackState.*;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Ultimate Goal Auto", group ="Concept")
+@Disabled
 
 public class UGAutonomous extends LinearOpMode {
 

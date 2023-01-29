@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.FFRobot.doorPosition;
 import static org.firstinspires.ftc.teamcode.FFRobot.armPosition;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,6 +14,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @TeleOp(name="TestFreight Frenzy One Driver", group="Test")
+@Disabled
+
 
 public class TestFreightFrenzyOneDriver extends LinearOpMode {
 

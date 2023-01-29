@@ -30,12 +30,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="FreightFrenzyAuto_Red2", group ="Autonomous")
+@Autonomous(name="FreightFrenzyAuto_Blue1", group ="Autonomous")
+@Disabled
 
 
-public class FFAutonomousRedTwo extends LinearOpMode {
+public class FFAutonomousBlueOne extends LinearOpMode {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -63,13 +65,38 @@ public class FFAutonomousRedTwo extends LinearOpMode {
         waitForStart();
 
         //START OF FFAuto
-    // Auto Position 2
-        //Red
-        mecanumDrive.forward(9,0.5);
-        mecanumDrive.rightTurn(90,0.5);
-        mecanumDrive.forward(35,1);
+    // Auto Position Blue 1
+        mecanumDrive.forward(6,0.5,true);
+        mecanumDrive.rightTurn(95,0.5);
+        mecanumDrive.forward(21,0.6,true);
+        mecanumDrive.rightTurn(25,0.5);
+        mecanumDrive.forward(3.5,0.3,true);
 
-        //Drive Back - comment out for compeition
+        for (int i=1; i<10; i++) {
+            robot.setDuckWheel(0.1*i);
+            sleep(50);
+        }
+        robot.setDuckWheel(1);
+        sleep(3000);
+        robot.setDuckWheel(0);
+        mecanumDrive.arcMove(1,-37,0.4,MecanumDrive.MoveDirection.RIGHT,false,true);
+        mecanumDrive.backward(25,0.6);
+        robot.moveArm(FFRobot.armPosition.HIGH);
+        mecanumDrive.arcMove(3,-105,0.5, MecanumDrive.MoveDirection.LEFT,false,true);
+        //moved to the hub : now move back to it
+        mecanumDrive.backward(8.5,0.4);
+        robot.setDoorPosition(FFRobot.doorPosition.DUMP);
+        sleep(1000);
+        //below distance to go away from the hub
+        mecanumDrive.forward(3,0.3);
+        mecanumDrive.arcMove(3,115,0.6,MecanumDrive.MoveDirection.RIGHT,false,true);
+        //angle before parking : now distance for parking
+        mecanumDrive.forward(60,1);
+        robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
+        robot.moveArm(FFRobot.armPosition.PICKUP);
+
+
+        //Drive back - comment out for compeition
         robot.moveArm(FFRobot.armPosition.PICKUP);
         sleep(300);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
@@ -92,6 +119,7 @@ public class FFAutonomousRedTwo extends LinearOpMode {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
         }
+
 
 
 

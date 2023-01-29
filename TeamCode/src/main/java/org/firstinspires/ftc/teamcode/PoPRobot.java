@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class PoPRobot {
@@ -72,12 +74,15 @@ public class PoPRobot {
     final double CLAW_CLOSED = 1;
     final double CLAW_OPEN = 0;
     final int ELEVATOR_TOLERANCE = 10;
+    final int ELEVATOR_UP_POSITION = 1850;
+    final int ELEVATOR_DOWN_POSITION = 0;
 
-    private DcMotorEx turret =null;
+    DcMotorEx turret =null;
     private DcMotorEx arm =null;
     private Servo claw =null;
     private DcMotorEx elevator =null;
     private Servo wrist =null;
+    double wristBasePosition=0;
 
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
@@ -95,11 +100,28 @@ public class PoPRobot {
             public void onError(int errorCode) {
             }
         });
-        turret = hardwareMap.get(DcMotorEx.class, "turret");
+        turret = hardwareMap.get(DcMotorEx.class, "turrets");
+        //turret = new HPMC(hardwareMap,"turrets",24000);
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.get(Servo.class, "claw");
         elevator = hardwareMap.get(DcMotorEx.class, "elevator");
         wrist = hardwareMap.get(Servo.class, "wrist");
+
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        //turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        //PIDCoefficients pidf = turret.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
+        //pidf.p=1000;
+        //pidf.i=100;
+        //pidf.d=0;
+        //turret.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pidf);
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public int getArmPosition(){
@@ -107,11 +129,19 @@ public class PoPRobot {
     }
 
     public void setMotorDirections (MecanumDrive mecanumDrive) {
-        mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
+        mecanumDrive.setMotorDirections(REVERSE, FORWARD, FORWARD, REVERSE);
     }
 
     public void setTurretPower(double turretPowerIn){
-        turret.setPower(turretPowerIn);
+
+        if ((turret.getCurrentPosition() < -24000) && (turretPowerIn < 0) ) {
+            turret.setPower(0);
+        } else if ( (turret.getCurrentPosition()) > 24000 && (turretPowerIn>0) )  {
+            turret.setPower(0);
+        } else {
+            turret.setPower(turretPowerIn);
+        }
+
     }
 
     public int getTurretPosition(){
@@ -127,9 +157,9 @@ public class PoPRobot {
             destination = TURN_LIMIT;
         }
         turret.setTargetPositionTolerance(TURRET_COUNT_PER_DEGREE);
-        turret.setTargetPosition(destination);
+        //turret.smoothMoveSetup(destination-turret.getCurrentPosition(), 0.6, 3,3, HPMC.Direction.FORWARD, true);
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(0.8);
+        turret.setPower(1);
     }
 
 
@@ -140,22 +170,26 @@ public class PoPRobot {
             degrees = -180;
         }
         int destination = (int) (TURRET_COUNT_PER_DEGREE * degrees);
+        //turret.smoothMoveSetup(destination-turret.getCurrentPosition(), 0.8, 3,3, HPMC.Direction.FORWARD, true);
+        turret.setPower(0);
         turret.setTargetPositionTolerance(TURRET_COUNT_PER_DEGREE);
-        turret.setTargetPosition(destination);
-        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(0.8);
+
     }
 
-    public boolean isTurretAtDestination() {
-        return (Math.abs(turret.getCurrentPosition() - turret.getTargetPosition()) < TURRET_COUNT_PER_DEGREE);
-    }
-    public int turretLeftToDestination() {
-        return (turret.getCurrentPosition() - turret.getTargetPosition());
-    }
-    public void turretFreeMoveMode() {
-        turret.setPower(0);
-        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
+    //public boolean isTurretAtDestination() {
+     //   return (Math.abs(turret.getCurrentPosition() - turret.getTargetPosition()) < TURRET_COUNT_PER_DEGREE);
+    //}
+    //public int turretLeftToDestination() {
+    //    return (turret.getCurrentPosition() - turret.getTargetPosition());
+    //}
+    //public DcMotorEx getTurret() {
+    //    return turret;
+    //}
+
+    //public void turretFreeMoveMode() {
+     //   turret.setPower(0);
+     //   turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    //}
 
     public void turnArmTo (double degrees){
         if (degrees > 250) {
@@ -169,9 +203,20 @@ public class PoPRobot {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(0.8);
     }
-    public void setWrist (double position){
-        wrist.setPosition(position);
+
+    /*
+    public boolean turretStillMoving() {
+        turret.updateCurrentVelocity();
+        return turret.smTick();
     }
+     */
+    public void setWrist (double position){
+        wristBasePosition=position;
+    }
+    public void setWristOffset(double offset) {
+        wrist.setPosition(wristBasePosition+offset);
+    }
+
     public boolean isArmAtDestination() {
         return (Math.abs(arm.getCurrentPosition() - arm.getTargetPosition()) < ARM_COUNT_PER_DEGREE);
     }
@@ -189,15 +234,30 @@ public class PoPRobot {
     }
 
 
+    public void setElevatorUp() {
+        setElevatorPosition(ELEVATOR_UP_POSITION);
+    }
+    public void setElevatorDown() {
+        setElevatorPosition(ELEVATOR_DOWN_POSITION);
+    }
     public void setElevatorPosition(int destination) {
+        elevator.setPower(0);
         elevator.setTargetPositionTolerance(ELEVATOR_TOLERANCE);
         elevator.setTargetPosition(destination);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        elevator.setPower(0.8);
+        elevator.setPower(1);
+
+    }
+    public void setElevatorPower(double power) {
+        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        elevator.setPower(power);
+    }
+    public void setElevatorFreeMove() {
+        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public int getElevatorPosition() {
-        return elevator.getTargetPosition();
+        return elevator.getCurrentPosition();
     }
     public void stopVision() {
         try {

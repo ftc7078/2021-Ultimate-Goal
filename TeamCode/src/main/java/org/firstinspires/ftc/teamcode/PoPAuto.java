@@ -31,6 +31,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 
 @Autonomous(name="PoPAuto", group ="Autonomous")
 
@@ -38,6 +41,7 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
+
 
     private PoPRobot robot = new PoPRobot();
     private int sleeveCode;
@@ -53,10 +57,12 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
     @Override public void runOpMode() {
 
-        mecanumDrive.init(hardwareMap, telemetry, this);
         robot.init(hardwareMap, telemetry, this);
-        mecanumDrive.setupTickCallback(this);
+        mecanumDrive.init(hardwareMap, telemetry, this);
+        mecanumDrive.setCountPerDegree(7);
+
         robot.setMotorDirections(mecanumDrive);
+        mecanumDrive.setupTickCallback(this);
         //mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
         //This is Object Detection (OD)
         //OD.init(hardwareMap, telemetry,this);
@@ -109,6 +115,7 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
         }
+        mecanumDrive.tickSleep();
     }
 
     public void tickCallback() {

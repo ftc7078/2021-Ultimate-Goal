@@ -30,12 +30,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="FreightFrenzyAuto_Blue2", group ="Autonomous")
+@Autonomous(name="FreightFrenzyAuto_Red2", group ="Autonomous")
+@Disabled
 
 
-public class FFAutonomousBlueTwo extends LinearOpMode {
+public class FFAutonomousRedTwo extends LinearOpMode {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -64,15 +66,16 @@ public class FFAutonomousBlueTwo extends LinearOpMode {
 
         //START OF FFAuto
     // Auto Position 2
-        //Blue
+        //Red
         mecanumDrive.forward(9,0.5);
-        mecanumDrive.leftTurn(90,0.5);
+        mecanumDrive.rightTurn(90,0.5);
         mecanumDrive.forward(35,1);
 
-        //Drive back - comment out for compeititon
+        //Drive Back - comment out for compeition
         robot.moveArm(FFRobot.armPosition.PICKUP);
         sleep(300);
         robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
+
         while (opModeIsActive()) {
             double speed = 1;
 
@@ -91,7 +94,6 @@ public class FFAutonomousBlueTwo extends LinearOpMode {
             rot = rot * speed;
             mecanumDrive.setMotors(strafe,fwd,rot, 1);
         }
-
 
 
 
