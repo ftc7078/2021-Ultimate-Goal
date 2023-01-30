@@ -83,7 +83,8 @@ public class PoPRobot {
     private DcMotorEx elevator =null;
     private Servo wrist =null;
     double wristBasePosition=0;
-
+    AprilTagDetection bestTag = null;
+    double bestTagRating = 0;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
         telemetry = telemetryIn;
@@ -268,8 +269,7 @@ public class PoPRobot {
     }
 
     public int getSleevePosition () {
-            AprilTagDetection bestTag = null;
-            double bestTagRating = 0;
+
             // Calling getDetectionsUpdate() will only return an object if there was a new frame
             // processed since the last time we called it. Otherwise, it will return null. This
             // enables us to only run logic when there has been a new frame, as opposed to the
@@ -296,7 +296,7 @@ public class PoPRobot {
                     if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) {
                         aprilTagDetectionPipeline.setDecimation(DECIMATION_HIGH);
                     }
-                    bestTagRating=bestTagRating-1;
+                    bestTagRating=bestTagRating-0.1;
                     if (bestTagRating < 0) {
                         bestTagRating = 0;
                         bestTag=null;
@@ -322,7 +322,8 @@ public class PoPRobot {
                 }
             }
             if (bestTag == null) {
-                return(0);
+                System.out.println ( "Best tag was null");
+                return(-1);
             } else {
                 String output = String.format("R: %.2f ID=%d XYZ: %.2f-%.2f-%.2f YPR: %.2f:%.2f:%.2f",
                         bestTagRating,
@@ -334,8 +335,8 @@ public class PoPRobot {
                         Math.toDegrees(bestTag.pose.pitch),
                         Math.toDegrees(bestTag.pose.roll)
                 );
-                telemetry.addLine(output);
-                telemetry.update();
+                //telemetry.addLine(output);
+                //telemetry.update();
                 System.out.println(output);
                 return (bestTag.id);
             }

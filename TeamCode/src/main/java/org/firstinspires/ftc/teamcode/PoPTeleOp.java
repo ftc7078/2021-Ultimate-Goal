@@ -115,7 +115,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
             } else {
                 robot.setTurretPower(gamepad2.left_stick_x );
             }*/
-            robot.setTurretPower(gamepad2.left_stick_x );
+            robot.setTurretPower(-gamepad2.left_stick_x );
 
             telemetry.addData("turretIsMoving", turretIsMoving);
             telemetry.addData("turretPosition", robot.getTurretPosition());

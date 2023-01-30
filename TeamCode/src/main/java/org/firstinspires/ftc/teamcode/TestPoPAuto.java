@@ -31,13 +31,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 
-@Autonomous(name="PoPAuto", group ="Autonomous")
+@Autonomous(name="Test PoPAuto", group ="Autonomous")
 
-public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
+public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -72,7 +70,7 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-        while (!isStarted() ) {
+        while (!isStarted()) {
             sleep(50);
             sleeveCode = robot.getSleevePosition();
             telemetry.addData("Sleeve", sleeveCode);
@@ -80,51 +78,22 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
         }
         waitForStart();
         robot.stopVision();
+        robot.setWrist(sleeveCode / 5);
         if (sleeveCode > 3) {
-            scoringDirection = ScoringDirection.SCORE_RIGHT;
             path = sleeveCode -3;
         } else {
-            scoringDirection = ScoringDirection.SCORE_LEFT;
             path = sleeveCode;
         }
         telemetry.addData("Sleeve", sleeveCode);
+
         telemetry.addData("Path", path);
         telemetry.update();
-        System.out.printf("Sleeve %d   Path %d\n" , sleeveCode , path);
-        mecanumDrive.forward(24,0.5);
-        if (path == 1) {
-            mecanumDrive.leftTurn(90,0.5);
-            mecanumDrive.forward(24,0.5);
-        } else if (path == 3){
-            mecanumDrive.rightTurn(90, 0.5);
-            mecanumDrive.forward(24, 0.5);
-        }
-
-        while (opModeIsActive()) {
-            double speed = 1;
-
-            speed = (gamepad1.right_trigger * 0.5) + 0.5;
-            double fwd = addDeadZone(gamepad1.left_stick_y);
-            double strafe = addDeadZone(gamepad1.left_stick_x);
-            double rot= addDeadZone(gamepad1.right_stick_x);
-
-            fwd = fwd * speed;
-            strafe =strafe * speed * 1.6;
-            if (strafe > 1) {
-                strafe = 1;
-            } else if (strafe < -1) {
-                strafe = -1;
-            }
-            rot = rot * speed;
-            mecanumDrive.setMotors(strafe,fwd,rot, 1);
-        }
-        mecanumDrive.tickSleep();
+        robot.setWrist(path/6);
+        robot.setWristOffset(0);
+        sleep(10000);
     }
 
     public void tickCallback() {
-        return;
-    }
-    public void tickCallbackDebug() {
         if (gamepad1.b) {
             mecanumDrive.debugMode = true;
         } else if (gamepad1.x) {
