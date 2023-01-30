@@ -31,29 +31,21 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-@TeleOp(name="PoPTurretTest", group ="TeleOp")
+@TeleOp(name="PoPTurretTestHPMC", group ="TeleOp")
 
-public class PoPTTest extends LinearOpMode  {
+public class PoPHPMCTest extends LinearOpMode  {
     private static final int TURRET_COUNT_PER_DEGREE = 135;
-    DcMotorEx turret = null;
+    HPMC turret = null;
     @Override
     public void runOpMode() {
-        turret = hardwareMap.get(DcMotorEx.class, "turrets");
+        turret = new HPMC(hardwareMap,"turrets",2800);
         waitForStart();
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        PIDFCoefficients pid = turret.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
-        pid.d = 0.01;
-        pid.f = 0.01;
-        turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
-        turret.setTargetPositionTolerance(10);
+        turret.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setLabel("turret");
 
         DetectOnce dpadUpOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_up);
         DetectOnce dpadDownOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_down);
@@ -63,62 +55,43 @@ public class PoPTTest extends LinearOpMode  {
         DetectOnce rightBumperOnce = new DetectOnce(gamepad2, DetectOnce.Button.right_bumper);
         DetectOnce startOnce = new DetectOnce(gamepad2, DetectOnce.Button.start);
         DetectOnce backOnce = new DetectOnce(gamepad2, DetectOnce.Button.back);
+        DetectOnce aOnce = new DetectOnce(gamepad2, DetectOnce.Button.a);
+        DetectOnce xOnce = new DetectOnce(gamepad2, DetectOnce.Button.x);
+        DetectOnce bOnce = new DetectOnce(gamepad2, DetectOnce.Button.b);
 
+        int decelerationTicks = 15;
 
         while (opModeIsActive()) {
-
-
             if (dpadUpOnce.pressed() ) {
-                pid.p = pid.p * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                decelerationTicks++;
             }
             if (dpadDownOnce.pressed()) {
-                pid.p = pid.p / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                decelerationTicks--;
             }
             if (dpadLeftOnce.pressed()) {
-                pid.i = pid.i * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
             }
             if (dpadRightOnce.pressed()) {
-                pid.i = pid.i / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
             }
             if (leftBumperOnce.pressed()) {
-                pid.d = pid.d * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
             }
             if (rightBumperOnce.pressed()) {
-                pid.d = pid.d / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
             }
             if (startOnce.pressed()) {
-                pid.f = pid.f * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
             }
             if (backOnce.pressed()) {
-                pid.f = pid.f / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
             }
 
-            if (gamepad2.b) {
-                turret.setTargetPosition(350);
-                turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                turret.setPower(1);
+            if (aOnce.pressed()) {
+                turret.runToPosition(350, 1,decelerationTicks);
             }
-            if (gamepad2.x) {
-                turret.setTargetPosition(0);
-                turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                turret.setPower(1);
+            if (xOnce.pressed()) {
+                turret.runToPosition(0, 1, decelerationTicks);
             }
-            if (gamepad2.a) {
-                turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                turret.setPower(0);
+            if (bOnce.pressed()) {
+                turret.stop();
             }
-            telemetry.addData("p", pid.p);
-            telemetry.addData("i", pid.i);
-            telemetry.addData("d", pid.d);
-            telemetry.addData("f", pid.f);
+            turret.onTick();
+            telemetry.addData("Deceleration Ticks",decelerationTicks);
             telemetry.addData("Position",turret.getCurrentPosition());
             telemetry.update();
             sleep(50);

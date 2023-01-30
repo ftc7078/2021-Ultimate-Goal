@@ -103,6 +103,14 @@ public class HPMC {
         motor.setPower(power);
     }
 
+    public void runToPosition(int position, double power, double decelerationTicks) {
+        int distance = position - motor.getCurrentPosition();
+        smoothMoveSetup(distance,power,3,decelerationTicks,Direction.FORWARD,true);
+
+    }
+    public void runToPosition(int position, double power) {
+        runToPosition(position, power, 10);
+    }
     public void setDesiredVelocity(double newDesiredVelocity) {
         desiredVelocity = newDesiredVelocity;
         updateCurrentVelocity();
@@ -426,6 +434,14 @@ public class HPMC {
         return false;
     }
 
+    boolean onTick() {
+        updateCurrentVelocity();
+        if (smState != MoveState.DONE) {
+            return smTick();
+        } else {
+            return false;
+        }
+    }
     double recoverLostSign(double number, double source) {
         if (source<0) {
             return(-number);
@@ -441,6 +457,13 @@ public class HPMC {
             desiredVelocity = 0;
         }
     }
+    public void stop() {
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            power = 0;
+            motor.setPower(0);
+            desiredVelocity = 0;
+            smState= MoveState.DONE;
+    }
 
     public void setTickTime(long tickTimeIn) {
         tickMillis = tickTimeIn;
@@ -455,6 +478,7 @@ public class HPMC {
     public double getVelocitySoon()  { return velocitySoon; }
     public double getUpdatesPerSecond() { return updatesPerSecond;}
     public int getCurrentPositionCached() { return currentPosition; }
+    public int getTargetPosition() { return (int) smEndPosition;}
     public int getCurrentPosition() { return motor.getCurrentPosition(); }
 
     public String getSMStatus() {
