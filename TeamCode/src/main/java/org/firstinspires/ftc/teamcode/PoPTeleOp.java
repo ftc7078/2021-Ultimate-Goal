@@ -166,6 +166,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
 
             }
             robot.setWristOffset(gamepad2.right_trigger/3);
+            robot.onTick();
             telemetry.update();
 
             //DRIVER
@@ -183,6 +184,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
             }
             rot = rot * speed;
             mecanumDrive.setMotors(strafe, fwd, rot, 1);
+            mecanumDrive.tickSleep();
         }
 
     }
