@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -45,14 +46,15 @@ public class PoPTTest extends LinearOpMode  {
     DcMotorEx turret = null;
     @Override
     public void runOpMode() {
-        turret = hardwareMap.get(DcMotorEx.class, "turrets");
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
         waitForStart();
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        PIDFCoefficients pid = turret.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
-        pid.d = 0.01;
-        pid.f = 0.01;
-        turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+        PIDFCoefficients pidf = turret.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
+        pidf.d = 0.01;
+        pidf.f = 0.01;
+
+        turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pidf);
         turret.setTargetPositionTolerance(10);
 
         DetectOnce dpadUpOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_up);
@@ -67,38 +69,37 @@ public class PoPTTest extends LinearOpMode  {
 
         while (opModeIsActive()) {
 
-
             if (dpadUpOnce.pressed() ) {
-                pid.p = pid.p * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.p = pidf.p * 2;
+                updatePIDF(pidf);
             }
             if (dpadDownOnce.pressed()) {
-                pid.p = pid.p / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.p = pidf.p / 2;
+                updatePIDF(pidf);
             }
             if (dpadLeftOnce.pressed()) {
-                pid.i = pid.i * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.i = pidf.i * 2;
+                updatePIDF(pidf);
             }
             if (dpadRightOnce.pressed()) {
-                pid.i = pid.i / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.i = pidf.i / 2;
+                updatePIDF(pidf);
             }
             if (leftBumperOnce.pressed()) {
-                pid.d = pid.d * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.d = pidf.d * 2;
+                updatePIDF(pidf);
             }
             if (rightBumperOnce.pressed()) {
-                pid.d = pid.d / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.d = pidf.d / 2;
+                updatePIDF(pidf);
             }
             if (startOnce.pressed()) {
-                pid.f = pid.f * 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.f = pidf.f * 2;
+                updatePIDF(pidf);
             }
             if (backOnce.pressed()) {
-                pid.f = pid.f / 2;
-                turret.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pid);
+                pidf.f = pidf.f / 2;
+                updatePIDF(pidf);
             }
 
             if (gamepad2.b) {
@@ -115,16 +116,24 @@ public class PoPTTest extends LinearOpMode  {
                 turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 turret.setPower(0);
             }
-            telemetry.addData("p", pid.p);
-            telemetry.addData("i", pid.i);
-            telemetry.addData("d", pid.d);
-            telemetry.addData("f", pid.f);
+            PIDCoefficients nowPID = turret.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
+            telemetry.addData("p", pidf.p);
+            telemetry.addData("i", pidf.i);
+            telemetry.addData("d", pidf.d);
+            //telemetry.addData("f", nowPIDF.f);
             telemetry.addData("Position",turret.getCurrentPosition());
             telemetry.update();
             sleep(50);
 
         }
 
+    }
+    public void updatePIDF(PIDFCoefficients pidf) {
+        PIDCoefficients pidNew = new PIDCoefficients(pidf.p, pidf.i, pidf.d);
+        //DcMotorControllerEx motorControllerEx = (DcMotorControllerEx)turret.getController();
+        //int motorIndex = turret.getPortNumber();
+        //motorControllerEx.setPIDFCoefficients(motorIndex, DcMotor.RunMode.RUN_TO_POSITION, pidfNew);
+        turret.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,pidNew);
     }
     public void turnTurretTo(double degrees){
         if (degrees > 180) {

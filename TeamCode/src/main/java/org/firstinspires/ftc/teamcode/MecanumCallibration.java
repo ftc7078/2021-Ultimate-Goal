@@ -90,7 +90,8 @@ public class MecanumCallibration extends LinearOpMode {
                 }
 
                 telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
-                mecanumDrive.motorTelemetry();
+                mecanumDrive.telemetryMotorPower();
+                mecanumDrive.telemetryMotorPosition();
 
             }
 

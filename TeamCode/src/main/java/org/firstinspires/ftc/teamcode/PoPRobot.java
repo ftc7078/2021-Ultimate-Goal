@@ -38,9 +38,8 @@ import java.util.ArrayList;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class PoPRobot {
@@ -68,7 +67,8 @@ public class PoPRobot {
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
-    final int TURRET_COUNT_PER_DEGREE = 135;
+    //final int TURRET_COUNT_PER_DEGREE = 135;
+    final int TURRET_COUNT_PER_DEGREE = 4;
     final int TURN_LIMIT = TURRET_COUNT_PER_DEGREE * 180;
     final double ARM_COUNT_PER_DEGREE = 4200 / 360;
     final double CLAW_CLOSED = 1;
@@ -77,7 +77,7 @@ public class PoPRobot {
     final int ELEVATOR_UP_POSITION = 1850;
     final int ELEVATOR_DOWN_POSITION = 0;
 
-    DcMotorEx turret =null;
+    BrakingDistanceMotorControler turret =null;
     private DcMotorEx arm =null;
     private Servo claw =null;
     private DcMotorEx elevator =null;
@@ -85,6 +85,8 @@ public class PoPRobot {
     double wristBasePosition=0;
     AprilTagDetection bestTag = null;
     double bestTagRating = 0;
+    DigitalChannel lowLimitSwitch;
+    DigitalChannel highLimitSwitch;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
         telemetry = telemetryIn;
@@ -101,21 +103,27 @@ public class PoPRobot {
             public void onError(int errorCode) {
             }
         });
-        turret = hardwareMap.get(DcMotorEx.class, "turrets");
-        //turret = new HPMC(hardwareMap,"turrets",24000);
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //turret = hardwareMap.get(DcMotorEx.class, "turret");
+        turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
+
+        turret.init();
+        turret.setAccelerationTicks(8);
+        turret.setDecelerationTicks(7);
+        turret.setAccelerationStartPower(0.3);
+        turret.setBrakingSpeed(4000);
+
 
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.get(Servo.class, "claw");
         elevator = hardwareMap.get(DcMotorEx.class, "elevator");
         wrist = hardwareMap.get(Servo.class, "wrist");
 
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lowLimitSwitch= hardwareMap.get(DigitalChannel.class,"limit_low");
+        highLimitSwitch = hardwareMap.get(DigitalChannel.class, "limit_high");
+
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        //turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //PIDCoefficients pidf = turret.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
         //pidf.p=1000;
@@ -150,31 +158,31 @@ public class PoPRobot {
     }
 
 
-    public void turnTurret(double degrees){
+    public void turnTurret(double degrees,double power){
         int destination = getTurretPosition() + (int) (degrees * TURRET_COUNT_PER_DEGREE);
         if (destination < -TURN_LIMIT) {
             destination = -TURN_LIMIT;
         } else if (destination > TURN_LIMIT) {
             destination = TURN_LIMIT;
         }
-        turret.setTargetPositionTolerance(TURRET_COUNT_PER_DEGREE);
-        //turret.smoothMoveSetup(destination-turret.getCurrentPosition(), 0.6, 3,3, HPMC.Direction.FORWARD, true);
-        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(1);
+
+        turret.runToPosition(destination,power);
     }
 
 
-    public void turnTurretTo(double degrees){
+    public void turnTurretTo(double degrees, double power){
         if (degrees > 180) {
             degrees = 180;
         } else if (degrees < -180) {
             degrees = -180;
         }
         int destination = (int) (TURRET_COUNT_PER_DEGREE * degrees);
-        //turret.smoothMoveSetup(destination-turret.getCurrentPosition(), 0.8, 3,3, HPMC.Direction.FORWARD, true);
-        turret.setPower(0);
-        turret.setTargetPositionTolerance(TURRET_COUNT_PER_DEGREE);
+        turret.runToPosition(destination,power);
 
+    }
+    public boolean turretStillMoving() {
+        turret.updateCurrentVelocity();
+        return turret.smTick();
     }
 
     //public boolean isTurretAtDestination() {
@@ -205,12 +213,9 @@ public class PoPRobot {
         arm.setPower(0.8);
     }
 
-    /*
-    public boolean turretStillMoving() {
-        turret.updateCurrentVelocity();
-        return turret.smTick();
-    }
-     */
+
+
+
     public void setWrist (double position){
         wristBasePosition=position;
     }
@@ -246,11 +251,20 @@ public class PoPRobot {
         elevator.setTargetPositionTolerance(ELEVATOR_TOLERANCE);
         elevator.setTargetPosition(destination);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        elevator.setPower(1);
+        setElevatorPowerWithLimitSwitches(1);
 
     }
     public void setElevatorPower(double power) {
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setElevatorPowerWithLimitSwitches(power);
+    }
+
+    public void setElevatorPowerWithLimitSwitches(double power) {
+        if (!highLimitSwitch.getState() && power > 0) {
+            power = 0;
+        } else if (!lowLimitSwitch.getState() && power < 0) {
+            power = 0;
+        }
         elevator.setPower(power);
     }
     public void setElevatorFreeMove() {

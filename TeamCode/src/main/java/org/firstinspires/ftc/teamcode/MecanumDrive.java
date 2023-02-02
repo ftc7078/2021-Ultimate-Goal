@@ -195,8 +195,12 @@ public class MecanumDrive {
         return ((int) (position / 4));
     }
 
-    void motorTelemetry() {
+    void telemetryMotorPower() {
+        telemetry.addData("Motors", "FL (%.2f), FR (%.2f), BL (%.2f), BR (%.2f)", power[FL], power[FR], power[BL], power[BR]);
+    }
+    void telemetryMotorPosition() {
         telemetry.addData("Encoders", "fl:%7d fr:%7d bl:%7d: br:%7d ", motors[FL].getCurrentPosition(), motors[FR].getCurrentPosition(), motors[BL].getCurrentPosition(), motors[BR].getCurrentPosition());
+
 
     }
     void setMotors(double x, double y, double rot, double slowdownFactor) {
@@ -218,7 +222,7 @@ public class MecanumDrive {
         double u = Math.cos(theta) * magnitude; //finds the input to one set of wheels
         double v = Math.sin(theta) * magnitude; //finds the input to the other set of wheels
 
-        telemetry.addData("Calculated XY", "nX (%.2f), nY (%.2f)", u, v);
+        //telemetry.addData("Calculated XY", "nX (%.2f), nY (%.2f)", u, v);
 
         double u2 = u * u;
         double v2 = v * v;
@@ -260,7 +264,7 @@ public class MecanumDrive {
 
         }
 
-        telemetry.addData("Motors", "lf (%.2f), rf (%.2f), lb (%.2f), rb (%.2f)", power[FL], power[FR], power[BL], power[BR]);
+        telemetry.addData("Motors", "FL (%.2f), FR (%.2f), BL (%.2f), BR (%.2f)", power[FL], power[FR], power[BL], power[BR]);
     }
     void forward(double inches, double power, boolean endStopped) { move(inches, power, MoveDirection.FORWARD, endStopped); }
     void forward(double inches, double power) {

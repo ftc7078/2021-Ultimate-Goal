@@ -4,9 +4,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
@@ -99,7 +98,8 @@ public class JustMecanum extends LinearOpMode {
             }
 
             telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
-            mecanumDrive.motorTelemetry();
+            mecanumDrive.telemetryMotorPower();
+            mecanumDrive.telemetryMotorPosition();
 
             j++;
             telemetry.addData("Number:", "%d", j);

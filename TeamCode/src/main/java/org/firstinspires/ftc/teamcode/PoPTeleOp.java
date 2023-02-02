@@ -54,6 +54,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
     private boolean wasXPressed = false;
     private boolean elevatorDirectControl = true;
 
+
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
@@ -92,30 +93,30 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
         while (opModeIsActive()) {
 
             //MANIPULATOR
-            /*
+
             if (turretIsMoving) {
-                if (robot.turretStillMoving() || gamepad2.back) {
+                if (!robot.turretStillMoving() || gamepad2.back) {
                     turretIsMoving = false;
                     //robot.turretFreeMoveMode();
                 } else {
                     //do nothing.  the motor will auto-set its own speed
                 }
             } else if (gamepad2.dpad_right) {
-                robot.turnTurretTo(45);
+                robot.turnTurretTo(45,1);
                 turretIsMoving = true;
             } else if (gamepad2.dpad_left) {
-                robot.turnTurretTo(-45);
+                robot.turnTurretTo(-45,1);
                 turretIsMoving = true;
             } else if (gamepad2.dpad_up) {
-                robot.turnTurretTo(135);
+                robot.turnTurretTo(135,1);
                 turretIsMoving = true;
             } else if (gamepad2.dpad_down) {
-                robot.turnTurretTo(-135);
+                robot.turnTurretTo(-135,1);
                 turretIsMoving = true;
             } else {
                 robot.setTurretPower(gamepad2.left_stick_x );
-            }*/
-            robot.setTurretPower(-gamepad2.left_stick_x );
+            }
+
 
             telemetry.addData("turretIsMoving", turretIsMoving);
             telemetry.addData("turretPosition", robot.getTurretPosition());

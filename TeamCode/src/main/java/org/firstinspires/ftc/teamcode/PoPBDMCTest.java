@@ -32,66 +32,92 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import static org.firstinspires.ftc.teamcode.ButtonPressDetector.Button;
 
-@TeleOp(name="PoPTurretTestHPMC", group ="TeleOp")
+@TeleOp(name="PoPTurretTestBDMC", group ="TeleOp")
 
-public class PoPHPMCTest extends LinearOpMode  {
+public class PoPBDMCTest extends LinearOpMode  {
     private static final int TURRET_COUNT_PER_DEGREE = 135;
-    HPMC turret = null;
+    BrakingDistanceMotorControler turret = null;
+
     @Override
     public void runOpMode() {
-        turret = new HPMC(hardwareMap,"turrets",2800);
+        //builtin encoder
+        //turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
+        //through bore encoder
+        turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
         waitForStart();
         turret.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setLabel("turret");
+        long brakingSpeed = 4000;
+        turret.setBrakingSpeed(brakingSpeed);
 
-        DetectOnce dpadUpOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_up);
-        DetectOnce dpadDownOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_down);
-        DetectOnce dpadLeftOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_left);
-        DetectOnce dpadRightOnce = new DetectOnce(gamepad2, DetectOnce.Button.dpad_right);
-        DetectOnce leftBumperOnce = new DetectOnce(gamepad2, DetectOnce.Button.left_bumper);
-        DetectOnce rightBumperOnce = new DetectOnce(gamepad2, DetectOnce.Button.right_bumper);
-        DetectOnce startOnce = new DetectOnce(gamepad2, DetectOnce.Button.start);
-        DetectOnce backOnce = new DetectOnce(gamepad2, DetectOnce.Button.back);
-        DetectOnce aOnce = new DetectOnce(gamepad2, DetectOnce.Button.a);
-        DetectOnce xOnce = new DetectOnce(gamepad2, DetectOnce.Button.x);
-        DetectOnce bOnce = new DetectOnce(gamepad2, DetectOnce.Button.b);
+        turret.setAccelerationStartPower(0.3);
+        ButtonPressDetector pressDetector = new ButtonPressDetector(gamepad2);
 
-        int decelerationTicks = 15;
+        int decelerationTicks = 10;
+        turret.setDecelerationTicks(decelerationTicks);
+
 
         while (opModeIsActive()) {
-            if (dpadUpOnce.pressed() ) {
-                decelerationTicks++;
+            if (pressDetector.wasToggled(Button.dpad_up)) {
+                System.out.println("Dpad Up was toggled");
             }
-            if (dpadDownOnce.pressed()) {
-                decelerationTicks--;
+            if (pressDetector.wasToggled(Button.left_stick_up)) {
+                System.out.println("left_stick_up Up was toggled");
             }
-            if (dpadLeftOnce.pressed()) {
-            }
-            if (dpadRightOnce.pressed()) {
-            }
-            if (leftBumperOnce.pressed()) {
-            }
-            if (rightBumperOnce.pressed()) {
-            }
-            if (startOnce.pressed()) {
-            }
-            if (backOnce.pressed()) {
+            if (pressDetector.wasToggled(Button.right_stick_button)) {
+                System.out.println("right_stick_button was toggled");
             }
 
-            if (aOnce.pressed()) {
-                turret.runToPosition(350, 1,decelerationTicks);
+
+            if (pressDetector.wasPressed(Button.dpad_up) ) {
+                decelerationTicks++;
+                turret.setDecelerationTicks(decelerationTicks);
             }
-            if (xOnce.pressed()) {
-                turret.runToPosition(0, 1, decelerationTicks);
+            if (pressDetector.wasPressed(Button.dpad_down)) {
+                decelerationTicks--;
+                turret.setDecelerationTicks(decelerationTicks);
+
             }
-            if (bOnce.pressed()) {
+            if (pressDetector.wasPressed(Button.left_trigger)) {
+                brakingSpeed=brakingSpeed + 100;
+                turret.setBrakingSpeed(brakingSpeed);
+
+            }
+            if (pressDetector.wasPressed(Button.right_trigger)) {
+                brakingSpeed=brakingSpeed - 100;
+                turret.setBrakingSpeed(brakingSpeed);
+            }
+            if (pressDetector.wasPressed(Button.dpad_left)) {
+                turret.setAccelerationTicks(turret.getAccelerationTicks()+1);
+            }
+            if (pressDetector.wasPressed(Button.dpad_right)) {
+                turret.setAccelerationTicks(turret.getAccelerationTicks()-1);
+            }
+
+            if (pressDetector.wasPressed(Button.left_bumper)) {
+                turret.setAccelerationStartPower(turret.getAccelerationStartPower()*0.8);
+            }
+            if (pressDetector.wasPressed(Button.right_bumper)) {
+                turret.setAccelerationStartPower(turret.getAccelerationStartPower()*1.25);
+            }
+
+            if (pressDetector.wasPressed(Button.b)) {
+                turret.runToPosition(175, 1);
+            }
+            if (pressDetector.wasPressed(Button.x)) {
+                turret.runToPosition(-175, 1);
+            }
+            if (pressDetector.wasPressed(Button.a)) {
                 turret.stop();
             }
             turret.onTick();
-            telemetry.addData("Deceleration Ticks",decelerationTicks);
+            telemetry.addData("Deceleration Ticks",turret.getDecelerationTicks());
+            telemetry.addData("Acceleration Ticks",turret.getAccelerationTicks());
+            telemetry.addData("Acceleration Start Power",turret.getAccelerationStartPower());
+            telemetry.addData("Braking Speed",turret.getBrakingSpeed());
+
             telemetry.addData("Position",turret.getCurrentPosition());
             telemetry.update();
             sleep(50);
