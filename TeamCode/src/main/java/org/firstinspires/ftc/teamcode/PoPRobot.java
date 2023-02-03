@@ -78,9 +78,9 @@ public class PoPRobot {
     final int ELEVATOR_DOWN_POSITION = 0;
 
     BrakingDistanceMotorControler turret =null;
+    BrakingDistanceMotorControler elevator =null;
     private DcMotorEx arm =null;
     private Servo claw =null;
-    private DcMotorEx elevator =null;
     private Servo wrist =null;
     double wristBasePosition=0;
     AprilTagDetection bestTag = null;
@@ -105,6 +105,7 @@ public class PoPRobot {
         });
         //turret = hardwareMap.get(DcMotorEx.class, "turret");
         turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
+        elevator = new BrakingDistanceMotorControler(hardwareMap,"elevator");
 
         turret.init();
         turret.setAccelerationTicks(32);
@@ -115,22 +116,15 @@ public class PoPRobot {
 
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.get(Servo.class, "claw");
-        elevator = hardwareMap.get(DcMotorEx.class, "elevator");
         wrist = hardwareMap.get(Servo.class, "wrist");
 
         lowLimitSwitch= hardwareMap.get(DigitalChannel.class,"limit_low");
         highLimitSwitch = hardwareMap.get(DigitalChannel.class, "limit_high");
 
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-        //PIDCoefficients pidf = turret.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
-        //pidf.p=1000;
-        //pidf.i=100;
-        //pidf.d=0;
-        //turret.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION,pidf);
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.init();
+        elevator.setAccelerationTicks(1);
+        elevator.setAccelerationStartPower(1);
     }
 
     public int getArmPosition(){
@@ -180,7 +174,7 @@ public class PoPRobot {
         turret.runToPosition(destination,power);
 
     }
-    public boolean turretStillMoving() {
+    public boolean turretTickResult() {
         turret.updateCurrentVelocity();
         return turret.smTick();
     }
@@ -247,17 +241,9 @@ public class PoPRobot {
         setElevatorPosition(ELEVATOR_DOWN_POSITION);
     }
     public void setElevatorPosition(int destination) {
-        elevator.setPower(0);
-        elevator.setTargetPositionTolerance(ELEVATOR_TOLERANCE);
-        elevator.setTargetPosition(destination);
-        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        setElevatorPowerWithLimitSwitches(1);
+        elevator.runToPosition(destination,1);
+    }
 
-    }
-    public void setElevatorPower(double power) {
-        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        setElevatorPowerWithLimitSwitches(power);
-    }
 
     public void setElevatorPowerWithLimitSwitches(double power) {
         if (!highLimitSwitch.getState() && power > 0) {
@@ -267,13 +253,25 @@ public class PoPRobot {
         }
         elevator.setPower(power);
     }
-    public void setElevatorFreeMove() {
-        elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void stopElevator() {
+        elevator.stop();
     }
 
     public int getElevatorPosition() {
         return elevator.getCurrentPosition();
     }
+
+
+    //returns true if we're not done moving
+    public boolean elevatorTickResult() {
+        if ( !highLimitSwitch.getState() || !lowLimitSwitch.getState() ) {
+            elevator.stop();
+            return false;
+        } else{
+            return elevator.smTick();
+        }
+    }
+
     public void stopVision() {
         try {
             camera.stopStreaming();

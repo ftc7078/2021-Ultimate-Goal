@@ -367,6 +367,7 @@ public class BrakingDistanceMotorControler {
         }
     }
 
+    //returns true if we're not done moving
     public boolean smTick() {
         return smTick(0);
     }

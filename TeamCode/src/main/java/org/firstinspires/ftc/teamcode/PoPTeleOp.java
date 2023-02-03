@@ -29,177 +29,166 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.ButtonPressDetector.Button.*;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name="PoPTeleOp", group ="TeleOp")
+@TeleOp(name = "PoPTeleOp", group = "TeleOp")
 
 public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
+private final MecanumDrive mecanumDrive = new MecanumDrive();
 
-    private MecanumDrive mecanumDrive = new MecanumDrive();
-
-    private PoPRobot robot = new PoPRobot();
-    private boolean turretIsMoving = false;
-    private int turretStart;
-    private boolean isElevatorUp = false;
-    private boolean wasXPressed = false;
-    private boolean elevatorIsMoving = true;
+private final PoPRobot robot = new PoPRobot();
+private boolean turretIsMoving = false;
+private boolean elevatorIsMoving = false;
 
 
-    //This is Object Detection (OD)
-    //private UGObjectDetector OD = new UGObjectDetector();
-    //private int DWAS = 2;//Duck Wheel Acceleration Speed
-
-    @Override
-    public void runOpMode() {
-        robot.init(hardwareMap, telemetry, this);
-        mecanumDrive.init(hardwareMap, telemetry, this);
-        robot.setMotorDirections(mecanumDrive);
-        mecanumDrive.setupTickCallback(this);
-        ButtonPressDetector pad2pressDetector = new ButtonPressDetector(gamepad2);
+@Override
+public void runOpMode() {
+    robot.init(hardwareMap, telemetry, this);
+    mecanumDrive.init(hardwareMap, telemetry, this);
+    robot.setMotorDirections(mecanumDrive);
+    mecanumDrive.setupTickCallback(this);
+    ButtonPressDetector pad2pressDetector = new ButtonPressDetector(gamepad2);
 
 
+    // Tell the driver that initialization is complete.
+    telemetry.addData("Status", "Initialized");
 
-        //mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
-        //This is Object Detection (OD)
-        //OD.init(hardwareMap, telemetry,this);
-        //mecanumDrive.setupTickCallback(robot);
-        //robot.multishotDelay = 225;+
+    while (!isStarted()) {
+        robot.getSleevePosition();
+        sleep(50);
+    }
+    waitForStart();
+    robot.stopVision();
+    //START OF FFAuto
+    // Auto Position 2 Fancy
 
 
-        // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+    //robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
+    while (opModeIsActive()) {
 
-        while (!isStarted()) {
-            robot.getSleevePosition();
-            sleep(50);
+        //MANIPULATOR
+
+        if (pad2pressDetector.wasPressed(dpad_up)) {
+            turnTurretTo(0);
+        } else if (pad2pressDetector.wasPressed(dpad_down)) {
+            turnTurretTo(180);
+        } else if (pad2pressDetector.wasPressed(dpad_left)) {
+            turnTurretTo(-90);
+        } else if (pad2pressDetector.wasPressed(dpad_right)) {
+            turnTurretTo(90);
+        } else if (pad2pressDetector.wasPressed(dpad_up_left)) {
+            turnTurretTo(-45);
+        } else if (pad2pressDetector.wasPressed(dpad_up_right)) {
+            turnTurretTo(45);
+        } else if (pad2pressDetector.wasPressed(dpad_down_left)) {
+            turnTurretTo(-135);
+        } else if (pad2pressDetector.wasPressed(dpad_down_right)) {
+            turnTurretTo(135);
+        } else if (turretIsMoving) {
+            if (!robot.turretTickResult() || gamepad2.back) {
+                turretIsMoving = false;
+                //robot.turretFreeMoveMode();
+            }
+        } else {
+            robot.setTurretPower(gamepad2.left_stick_x);
         }
-        waitForStart();
-        robot.stopVision();
-        //START OF FFAuto
-        // Auto Position 2 Fancy
 
 
-        //robot.setDoorPosition(FFRobot.doorPosition.PICKUP);
-        while (opModeIsActive()) {
+        if (gamepad2.a) {
+            robot.turnArmTo(250);
+            robot.setWrist(1);
+        } else if (gamepad2.x) {
+            robot.turnArmTo(120);
+            robot.setWrist(0.5);
+        } else if (gamepad2.b) {
+            robot.turnArmTo(155);
+            robot.setWrist(0.5);
+        } else if (gamepad2.y) {
+            robot.turnArmTo(90);
+            robot.setWrist(0);
+        } else if (gamepad2.start) {
+            robot.turnArmTo(0);
+            robot.setWrist(0);
+        }
 
-            //MANIPULATOR
-
-            if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_up)) {
-                turnTurretTo(0);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_down)) {
-                turnTurretTo(180);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_left)) {
-                turnTurretTo(-90);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_right)) {
-                turnTurretTo(90);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_up_left)) {
-                turnTurretTo(-45);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_up_right)) {
-                turnTurretTo(45);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_down_left)) {
-                turnTurretTo(-135);
-            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_down_right)) {
-                turnTurretTo(135);
-            } else if (turretIsMoving) {
-                if (!robot.turretStillMoving() || gamepad2.back) {
-                    turretIsMoving = false;
-                    //robot.turretFreeMoveMode();
-                }
+        if (elevatorIsMoving) {
+            if (gamepad2.back) {
+                robot.stopElevator();
+                elevatorIsMoving = false;
             } else {
-                robot.setTurretPower(gamepad2.left_stick_x );
+                if (robot.elevatorTickResult() == false) {
+                    //done moving
+                    elevatorIsMoving = false;
+                }
+                telemetry.addData("elevator power", "Auto");
             }
-
-
-            telemetry.addData("turretIsMoving", turretIsMoving);
-            telemetry.addData("turretPosition", robot.getTurretPosition());
-            telemetry.addData("turretPower", robot.turret.getPower());
-
-
-
-            if (gamepad2.a) {
-                robot.turnArmTo(250);
-                robot.setWrist(1);
-            } else if (gamepad2.x) {
-                robot.turnArmTo(120);
-                robot.setWrist(0.5);
-            } else if (gamepad2.b) {
-                robot.turnArmTo(155);
-                robot.setWrist(0.5);
-            } else if (gamepad2.y) {
-                robot.turnArmTo(90);
-                robot.setWrist(0);
-            } else if (gamepad2.start) {
-                robot.turnArmTo(0);
-                robot.setWrist(0);
-            }
-            if (elevatorIsMoving) {
-                robot.setElevatorPower(-gamepad2.right_stick_x);
+        } else {
+            if (pad2pressDetector.wasPressed(right_stick_up)) {
+                robot.setElevatorUp();
+            } else if (pad2pressDetector.wasPressed(right_stick_down)) {
+                robot.setElevatorDown();
+            } else {
+                robot.setElevatorPowerWithLimitSwitches(-gamepad2.right_stick_x);
                 telemetry.addData("elevator power", -gamepad2.right_stick_x);
-            } else {
-                if (gamepad2.x && wasXPressed == false) {
-                    if (isElevatorUp) {
-                        isElevatorUp = false;
-                        robot.setElevatorUp();
-                    } else {
-                        isElevatorUp = true;
-                        robot.setElevatorDown();
-                    }
-                }
-                wasXPressed = gamepad2.x;
             }
-            telemetry.addData("Turret Position", robot.getTurretPosition());
-            telemetry.addData("Arm Position", robot.getArmPosition());
-            telemetry.addData("Elevator Position", robot.getElevatorPosition());
-            telemetry.addData("isElevatorUp", isElevatorUp);
-
-            if (gamepad2.right_bumper || gamepad2.left_bumper) {
-                robot.clawGrab();
-            } else {
-                robot.setClawPosition(gamepad2.left_trigger);
-
-            }
-            robot.setWristOffset(gamepad2.right_trigger/3);
-            telemetry.update();
-
-            //DRIVER
-            double speed = 1;
-            speed = (gamepad1.right_trigger * 0.5) + 0.5;
-            double fwd = addDeadZone(gamepad1.left_stick_y);
-            double strafe = addDeadZone(gamepad1.left_stick_x);
-            double rot = addDeadZone(gamepad1.right_stick_x);
-            fwd = fwd * speed;
-            strafe = strafe * speed * 1.6;
-            if (strafe > 1) {
-                strafe = 1;
-            } else if (strafe < -1) {
-                strafe = -1;
-            }
-            rot = rot * speed;
-            mecanumDrive.setMotors(strafe, fwd, rot, 1);
         }
 
-    }
-    public void turnTurretTo(double degrees) {
-        robot.turnTurretTo(-degrees, 1);
-        turretIsMoving = true;
-    }
 
-    public void tickCallback() {
-        if (gamepad1.b) {
-            mecanumDrive.debugMode = true;
-        } else if (gamepad1.x) {
-            mecanumDrive.debugMode = false;
+        if (gamepad2.right_bumper || gamepad2.left_bumper) {
+            robot.clawGrab();
+        } else {
+            robot.setClawPosition(gamepad2.left_trigger);
         }
-        telemetry.addData("debugMode", mecanumDrive.debugMode );
+        robot.setWristOffset(gamepad2.right_trigger / 3);
+
+        standardMecanumControls();
         telemetry.update();
+
+        telemetry.addData("turretIsMoving", turretIsMoving);
+        telemetry.addData("turretPosition", robot.getTurretPosition());
+        telemetry.addData("turretPower", robot.turret.getPower());
+        telemetry.addData("Turret Position", robot.getTurretPosition());
+        telemetry.addData("Arm Position", robot.getArmPosition());
+        telemetry.addData("Elevator Position", robot.getElevatorPosition());
     }
 
-    double addDeadZone(double input) {
-        if (Math.abs(input) < 0.1) {return(0.0);}
-        return(input);
+}
+
+public void standardMecanumControls() {
+    double speed = 1;
+    speed = (gamepad1.right_trigger * 0.5) + 0.5;
+    double fwd = addDeadZone(gamepad1.left_stick_y) * speed;
+
+    double rot = addDeadZone(gamepad1.right_stick_x) * speed;
+
+    double strafe = addDeadZone(gamepad1.left_stick_x);
+    strafe = strafe * speed * 1.6;
+    if (strafe > 1) {
+        strafe = 1;
+    } else if (strafe < -1) {
+        strafe = -1;
     }
+    mecanumDrive.setMotors(strafe, fwd, rot, 1);
+}
+
+public void turnTurretTo(double degrees) {
+    robot.turnTurretTo(-degrees, 1);
+    turretIsMoving = true;
+}
+
+public void tickCallback() {
+}
+
+double addDeadZone(double input) {
+    if (Math.abs(input) < 0.1) {
+        return (0.0);
+    }
+    return (input);
+}
 
 }
