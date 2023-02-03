@@ -5,7 +5,6 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorDigitalTouch;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.apriltag.AprilTagDetection;
@@ -39,7 +38,6 @@ import java.util.ArrayList;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -79,16 +77,14 @@ public class PoPRobot {
     final int ELEVATOR_UP_POSITION = 1850;
     final int ELEVATOR_DOWN_POSITION = 0;
 
-    DcMotorEx turret = null;
-    private DcMotorEx arm = null;
-    private Servo claw = null;
-    private DcMotorEx elevator = null;
-    private Servo wrist = null;
-    double wristBasePosition = 0;
+    DcMotorEx turret =null;
+    private DcMotorEx arm =null;
+    private Servo claw =null;
+    private DcMotorEx elevator =null;
+    private Servo wrist =null;
+    double wristBasePosition=0;
     AprilTagDetection bestTag = null;
     double bestTagRating = 0;
-    private DigitalChannel elevatorLowSensor;
-    private DigitalChannel elevatorHighSensor;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
         telemetry = telemetryIn;
@@ -113,8 +109,6 @@ public class PoPRobot {
         claw = hardwareMap.get(Servo.class, "claw");
         elevator = hardwareMap.get(DcMotorEx.class, "elevator");
         wrist = hardwareMap.get(Servo.class, "wrist");
-        elevatorLowSensor = hardwareMap.get(DigitalChannel.class, "elevator_low");
-        elevatorHighSensor = hardwareMap.get(DigitalChannel.class, "elevator_high");
 
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -131,19 +125,19 @@ public class PoPRobot {
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    public int getArmPosition() {
+    public int getArmPosition(){
         return arm.getCurrentPosition();
     }
 
-    public void setMotorDirections(MecanumDrive mecanumDrive) {
+    public void setMotorDirections (MecanumDrive mecanumDrive) {
         mecanumDrive.setMotorDirections(REVERSE, FORWARD, FORWARD, REVERSE);
     }
 
-    public void setTurretPower(double turretPowerIn) {
+    public void setTurretPower(double turretPowerIn){
 
-        if ((turret.getCurrentPosition() < -24000) && (turretPowerIn < 0)) {
+        if ((turret.getCurrentPosition() < -24000) && (turretPowerIn < 0) ) {
             turret.setPower(0);
-        } else if ((turret.getCurrentPosition()) > 24000 && (turretPowerIn > 0)) {
+        } else if ( (turret.getCurrentPosition()) > 24000 && (turretPowerIn>0) )  {
             turret.setPower(0);
         } else {
             turret.setPower(turretPowerIn);
@@ -151,12 +145,12 @@ public class PoPRobot {
 
     }
 
-    public int getTurretPosition() {
+    public int getTurretPosition(){
         return turret.getCurrentPosition();
     }
 
 
-    public void turnTurret(double degrees) {
+    public void turnTurret(double degrees){
         int destination = getTurretPosition() + (int) (degrees * TURRET_COUNT_PER_DEGREE);
         if (destination < -TURN_LIMIT) {
             destination = -TURN_LIMIT;
@@ -170,7 +164,7 @@ public class PoPRobot {
     }
 
 
-    public void turnTurretTo(double degrees) {
+    public void turnTurretTo(double degrees){
         if (degrees > 180) {
             degrees = 180;
         } else if (degrees < -180) {
@@ -184,7 +178,7 @@ public class PoPRobot {
     }
 
     //public boolean isTurretAtDestination() {
-    //   return (Math.abs(turret.getCurrentPosition() - turret.getTargetPosition()) < TURRET_COUNT_PER_DEGREE);
+     //   return (Math.abs(turret.getCurrentPosition() - turret.getTargetPosition()) < TURRET_COUNT_PER_DEGREE);
     //}
     //public int turretLeftToDestination() {
     //    return (turret.getCurrentPosition() - turret.getTargetPosition());
@@ -194,11 +188,11 @@ public class PoPRobot {
     //}
 
     //public void turretFreeMoveMode() {
-    //   turret.setPower(0);
-    //   turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+     //   turret.setPower(0);
+     //   turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     //}
 
-    public void turnArmTo(double degrees) {
+    public void turnArmTo (double degrees){
         if (degrees > 250) {
             degrees = 250;
         } else if (degrees < 0) {
@@ -217,23 +211,22 @@ public class PoPRobot {
         return turret.smTick();
     }
      */
-    public void setWrist(double position) {
-        wristBasePosition = position;
+    public void setWrist (double position){
+        wristBasePosition=position;
     }
-
     public void setWristOffset(double offset) {
-        wrist.setPosition(wristBasePosition + offset);
+        wrist.setPosition(wristBasePosition+offset);
     }
 
     public boolean isArmAtDestination() {
         return (Math.abs(arm.getCurrentPosition() - arm.getTargetPosition()) < ARM_COUNT_PER_DEGREE);
     }
 
-    public void clawGrab() {
+    public void clawGrab(){
         claw.setPosition(CLAW_CLOSED);
     }
 
-    public void clawRelease() {
+    public void clawRelease(){
         claw.setPosition(CLAW_OPEN);
     }
 
@@ -245,25 +238,21 @@ public class PoPRobot {
     public void setElevatorUp() {
         setElevatorPosition(ELEVATOR_UP_POSITION);
     }
-
     public void setElevatorDown() {
         setElevatorPosition(ELEVATOR_DOWN_POSITION);
     }
-
     public void setElevatorPosition(int destination) {
         elevator.setPower(0);
         elevator.setTargetPositionTolerance(ELEVATOR_TOLERANCE);
         elevator.setTargetPosition(destination);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        setElevatorPowerWithLimitSwitches(1);
+        elevator.setPower(1);
 
     }
-
     public void setElevatorPower(double power) {
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        setElevatorPowerWithLimitSwitches(power);
+        elevator.setPower(power);
     }
-
     public void setElevatorFreeMove() {
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -271,106 +260,85 @@ public class PoPRobot {
     public int getElevatorPosition() {
         return elevator.getCurrentPosition();
     }
-
     public void stopVision() {
         try {
             camera.stopStreaming();
-        } catch (Exception e) {
+        } catch(Exception e) {
             //ignore
         }
     }
 
-    public int getSleevePosition() {
+    public int getSleevePosition () {
 
-        // Calling getDetectionsUpdate() will only return an object if there was a new frame
-        // processed since the last time we called it. Otherwise, it will return null. This
-        // enables us to only run logic when there has been a new frame, as opposed to the
-        // getLatestDetections() method which will always return an object.
-        ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getDetectionsUpdate();
+            // Calling getDetectionsUpdate() will only return an object if there was a new frame
+            // processed since the last time we called it. Otherwise, it will return null. This
+            // enables us to only run logic when there has been a new frame, as opposed to the
+            // getLatestDetections() method which will always return an object.
+            ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getDetectionsUpdate();
 
-        // If there's been a new frame...
-        if (detections != null) {
+            // If there's been a new frame...
+            if (detections != null) {
 
-            // If we don't see any tags
-            if (detections.size() == 0) {
-                numFramesWithoutDetection++;
+                // If we don't see any tags
+                if (detections.size() == 0) {
+                    numFramesWithoutDetection++;
 
-                // If we haven't seen a tag for a few frames, lower the decimation
-                // so we can hopefully pick one up if we're e.g. far back
-                if (numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
-                    aprilTagDetectionPipeline.setDecimation(DECIMATION_LOW);
-                }
-            } else {
-                numFramesWithoutDetection = 0;
-
-                // If the target is within 1 meter, turn on high decimation to
-                // increase the frame rate
-                if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) {
-                    aprilTagDetectionPipeline.setDecimation(DECIMATION_HIGH);
-                }
-                bestTagRating = bestTagRating - 0.1;
-                if (bestTagRating < 0) {
-                    bestTagRating = 0;
-                    bestTag = null;
-                }
-                for (AprilTagDetection detection : detections) {
-                    double thisTagRating = 0;
-                    if ((detection.id > 0) && (detection.id < 7)) {
-                        thisTagRating = 10 / (1 +
-                                Math.abs(detection.pose.x) +
-                                Math.abs(detection.pose.y) +
-                                (Math.abs(Math.toDegrees(detection.pose.yaw) + 12) / 45) +
-                                (Math.abs(Math.toDegrees(detection.pose.pitch)) / 45) +
-                                (Math.abs(Math.toDegrees(detection.pose.roll)) / 45)
-                        );
-
-
+                    // If we haven't seen a tag for a few frames, lower the decimation
+                    // so we can hopefully pick one up if we're e.g. far back
+                    if(numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION) {
+                        aprilTagDetectionPipeline.setDecimation(DECIMATION_LOW);
                     }
-                    if (thisTagRating > bestTagRating) {
-                        bestTag = detection;
-                        bestTagRating = thisTagRating;
+                } else {
+                    numFramesWithoutDetection = 0;
+
+                    // If the target is within 1 meter, turn on high decimation to
+                    // increase the frame rate
+                    if (detections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS) {
+                        aprilTagDetectionPipeline.setDecimation(DECIMATION_HIGH);
+                    }
+                    bestTagRating=bestTagRating-0.1;
+                    if (bestTagRating < 0) {
+                        bestTagRating = 0;
+                        bestTag=null;
+                    }
+                    for(AprilTagDetection detection : detections) {
+                        double thisTagRating = 0;
+                        if ((detection.id > 0) && (detection.id < 7)) {
+                            thisTagRating = 10 / (1 +
+                                    Math.abs(detection.pose.x) +
+                                    Math.abs(detection.pose.y) +
+                                    (Math.abs(Math.toDegrees(detection.pose.yaw) + 12) / 45) +
+                                    (Math.abs(Math.toDegrees(detection.pose.pitch)) / 45) +
+                                    (Math.abs(Math.toDegrees(detection.pose.roll)) / 45)
+                            );
+
+
+                        }
+                        if (thisTagRating > bestTagRating) {
+                            bestTag=detection;
+                            bestTagRating=thisTagRating;
+                        }
                     }
                 }
             }
-        }
-        if (bestTag == null) {
-            System.out.println("Best tag was null");
-            return (-1);
-        } else {
-            String output = String.format("R: %.2f ID=%d XYZ: %.2f-%.2f-%.2f YPR: %.2f:%.2f:%.2f",
-                    bestTagRating,
-                    bestTag.id,
-                    bestTag.pose.x * FEET_PER_METER,
-                    bestTag.pose.y * FEET_PER_METER,
-                    bestTag.pose.z * FEET_PER_METER,
-                    Math.toDegrees(bestTag.pose.yaw),
-                    Math.toDegrees(bestTag.pose.pitch),
-                    Math.toDegrees(bestTag.pose.roll)
-            );
-            //telemetry.addLine(output);
-            //telemetry.update();
-            System.out.println(output);
-            return (bestTag.id);
+            if (bestTag == null) {
+                System.out.println ( "Best tag was null");
+                return(-1);
+            } else {
+                String output = String.format("R: %.2f ID=%d XYZ: %.2f-%.2f-%.2f YPR: %.2f:%.2f:%.2f",
+                        bestTagRating,
+                        bestTag.id,
+                        bestTag.pose.x * FEET_PER_METER,
+                        bestTag.pose.y * FEET_PER_METER,
+                        bestTag.pose.z * FEET_PER_METER,
+                        Math.toDegrees(bestTag.pose.yaw),
+                        Math.toDegrees(bestTag.pose.pitch),
+                        Math.toDegrees(bestTag.pose.roll)
+                );
+                //telemetry.addLine(output);
+                //telemetry.update();
+                System.out.println(output);
+                return (bestTag.id);
+            }
         }
     }
-
-    public void setElevatorPowerWithLimitSwitches(double power){
-        if ((elevatorLowSensor.getState() == false) && (power < 0) ) {
-            power=0;
-        }
-        if ((elevatorHighSensor.getState() == false) && (power > 0)) {
-            power=0;
-        }
-        elevator.setPower(power);
-    }
-    public void checkLimitSwitches(){
-        if (elevator.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
-            elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
-        setElevatorPowerWithLimitSwitches(elevator.getPower());
-    }
-
-    public void onTick() {
-        checkLimitSwitches();
-    }
-}
