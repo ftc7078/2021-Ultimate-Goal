@@ -29,15 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @TeleOp(name="PoPTeleOp", group ="TeleOp")
 
@@ -52,13 +45,12 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
     private int turretStart;
     private boolean isElevatorUp = false;
     private boolean wasXPressed = false;
-    private boolean elevatorDirectControl = true;
+    private boolean elevatorIsMoving = true;
 
 
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
-
 
     @Override
     public void runOpMode() {
@@ -66,6 +58,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
         mecanumDrive.init(hardwareMap, telemetry, this);
         robot.setMotorDirections(mecanumDrive);
         mecanumDrive.setupTickCallback(this);
+        ButtonPressDetector pad2pressDetector = new ButtonPressDetector(gamepad2);
 
 
 
@@ -94,25 +87,27 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
 
             //MANIPULATOR
 
-            if (turretIsMoving) {
+            if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_up)) {
+                turnTurretTo(0);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_down)) {
+                turnTurretTo(180);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_left)) {
+                turnTurretTo(-90);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_right)) {
+                turnTurretTo(90);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_up_left)) {
+                turnTurretTo(-45);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_up_right)) {
+                turnTurretTo(45);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_down_left)) {
+                turnTurretTo(-135);
+            } else if (pad2pressDetector.wasPressed(ButtonPressDetector.Button.dpad_down_right)) {
+                turnTurretTo(135);
+            } else if (turretIsMoving) {
                 if (!robot.turretStillMoving() || gamepad2.back) {
                     turretIsMoving = false;
                     //robot.turretFreeMoveMode();
-                } else {
-                    //do nothing.  the motor will auto-set its own speed
                 }
-            } else if (gamepad2.dpad_right) {
-                robot.turnTurretTo(45,1);
-                turretIsMoving = true;
-            } else if (gamepad2.dpad_left) {
-                robot.turnTurretTo(-45,1);
-                turretIsMoving = true;
-            } else if (gamepad2.dpad_up) {
-                robot.turnTurretTo(135,1);
-                turretIsMoving = true;
-            } else if (gamepad2.dpad_down) {
-                robot.turnTurretTo(-135,1);
-                turretIsMoving = true;
             } else {
                 robot.setTurretPower(gamepad2.left_stick_x );
             }
@@ -140,9 +135,9 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
                 robot.turnArmTo(0);
                 robot.setWrist(0);
             }
-            if (elevatorDirectControl) {
-                robot.setElevatorPower(-gamepad2.right_stick_y);
-                telemetry.addData("elevator power", -gamepad2.right_stick_y);
+            if (elevatorIsMoving) {
+                robot.setElevatorPower(-gamepad2.right_stick_x);
+                telemetry.addData("elevator power", -gamepad2.right_stick_x);
             } else {
                 if (gamepad2.x && wasXPressed == false) {
                     if (isElevatorUp) {
@@ -186,6 +181,10 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
             mecanumDrive.setMotors(strafe, fwd, rot, 1);
         }
 
+    }
+    public void turnTurretTo(double degrees) {
+        robot.turnTurretTo(-degrees, 1);
+        turretIsMoving = true;
     }
 
     public void tickCallback() {

@@ -107,9 +107,9 @@ public class PoPRobot {
         turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
 
         turret.init();
-        turret.setAccelerationTicks(8);
-        turret.setDecelerationTicks(7);
-        turret.setAccelerationStartPower(0.3);
+        turret.setAccelerationTicks(32);
+        turret.setDecelerationTicks(12);
+        turret.setAccelerationStartPower(0.24);
         turret.setBrakingSpeed(4000);
 
 

@@ -6,8 +6,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class ButtonPressDetector {
 
 
-    public enum Button {a,b,x,y,dpad_up,dpad_down,dpad_left,dpad_right,left_bumper,
-        right_bumper, start, share,back, left_stick_button, right_stick_button,
+    public enum Button {a,b,x,y,
+        dpad_up,dpad_down,dpad_left,dpad_right,
+        dpad_up_left, dpad_up_right, dpad_down_left, dpad_down_right,
+        left_bumper, right_bumper, start, share,back,
+        left_stick_button, right_stick_button,
         left_trigger, right_trigger,
         left_stick_left, left_stick_right, left_stick_up, left_stick_down,
         right_stick_left, right_stick_right, right_stick_up, right_stick_down,
@@ -79,10 +82,14 @@ public class ButtonPressDetector {
             case b: thisState = gamepad.b;break;
             case x: thisState = gamepad.x; break;
             case y: thisState = gamepad.y; break;
-            case dpad_up: thisState = gamepad.dpad_up; break;
-            case dpad_down: thisState = gamepad.dpad_down; break;
-            case dpad_left: thisState = gamepad.dpad_left; break;
-            case dpad_right: thisState = gamepad.dpad_right; break;
+            case dpad_up: thisState = gamepad.dpad_up && !gamepad.dpad_left && !gamepad.dpad_right; break;
+            case dpad_down: thisState = gamepad.dpad_down && !gamepad.dpad_right && !gamepad.dpad_left; break;
+            case dpad_left: thisState = gamepad.dpad_left && !gamepad.dpad_up && !gamepad.dpad_down; break;
+            case dpad_right: thisState = gamepad.dpad_right && !gamepad.dpad_up && !gamepad.dpad_down; break;
+            case dpad_up_left: thisState = gamepad.dpad_up && gamepad.dpad_left; break;
+            case dpad_up_right: thisState = gamepad.dpad_up && gamepad.dpad_right; break;
+            case dpad_down_left: thisState = gamepad.dpad_down && gamepad.dpad_left; break;
+            case dpad_down_right: thisState = gamepad.dpad_down && gamepad.dpad_right; break;
             case left_bumper: thisState = gamepad.left_bumper; break;
             case right_bumper: thisState = gamepad.right_bumper; break;
             case start: thisState = gamepad.start; break;
