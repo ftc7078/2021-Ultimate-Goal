@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.old_teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -46,9 +46,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name = "Test: Motor Test Two", group = "Test")
+@TeleOp(name = "Concept: Ramp Motor Speed", group = "Test")
+@Disabled
 
-public class MotorTest2 extends LinearOpMode {
+public class MotorRampTest extends LinearOpMode {
 
     static final double INCREMENT   = 0.01;     // amount to ramp motor each CYCLE_MS cycle
     static final int    CYCLE_MS    =   50;     // period of each cycle
@@ -68,19 +69,35 @@ public class MotorTest2 extends LinearOpMode {
         // Change the text in quotes to match any motor name on your robot.
         motor = hardwareMap.get(DcMotor.class, "MotorOne");
 
-        // Wait for the start buttonPOI98
+        // Wait for the start button
         telemetry.addData(">", "Press Start to run Motors." );
         telemetry.update();
         waitForStart();
 
         // Ramp motor speeds till stop pressed.
         while(opModeIsActive()) {
-            power=-gamepad1.left_stick_y;
-            motor.setPower(power);
+
+            // Ramp the motors, according to the rampUp variable.
+            if (rampUp) {
+                // Keep stepping up until we hit the max value.
+                power += INCREMENT ;
+                if (power >= MAX_FWD ) {
+                    power = MAX_FWD;
+                    rampUp = !rampUp;   // Switch ramp direction
+                }
+            }
+            else {
+                // Keep stepping down until we hit the min value.6v
+                power -= INCREMENT ;
+                if (power <= MAX_REV ) {
+                    power = MAX_REV;
+                    rampUp = !rampUp;  // Switch ramp direction
+                }
+            }
 
             // Display the current value
             telemetry.addData("Motor Power", "%5.2f", power);
-            telemetry.addData("Motor Position", "%d", motor.getCurrentPosition());
+            telemetry.addData("Motor Position", "%5.2f", motor.getCurrentPosition());
 
             telemetry.addData(">", "Press Stop to end test." );
             telemetry.update();
