@@ -78,7 +78,7 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
         }
         waitForStart();
         robot.stopVision();
-        robot.setWrist(sleeveCode / 5);
+        robot.setWristBasePosition(sleeveCode / 5);
         if (sleeveCode > 3) {
             path = sleeveCode -3;
         } else {
@@ -88,7 +88,7 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
         telemetry.addData("Path", path);
         telemetry.update();
-        robot.setWrist(path/6);
+        robot.setWristBasePosition(path/6);
         robot.setWristOffset(0);
         sleep(10000);
     }

@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
@@ -40,7 +41,7 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @TeleOp(name="PoPTurretTest", group ="TeleOp")
-
+@Disabled
 public class PoPTTest extends LinearOpMode  {
     private static final int TURRET_COUNT_PER_DEGREE = 135;
     DcMotorEx turret = null;

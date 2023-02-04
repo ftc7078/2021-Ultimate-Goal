@@ -70,15 +70,15 @@ public class PoPRobot {
     //final int TURRET_COUNT_PER_DEGREE = 135;
     final int TURRET_COUNT_PER_DEGREE = 4;
     final int TURN_LIMIT = TURRET_COUNT_PER_DEGREE * 180;
-    final double ARM_COUNT_PER_DEGREE = 4200 / 360;
-    final double CLAW_CLOSED = 1;
-    final double CLAW_OPEN = 0;
+    final double ARM_COUNT_PER_DEGREE = 4000 / 360;
+    final double CLAW_CLOSED = 0;
+    final double CLAW_OPEN = 1;
     final int ELEVATOR_TOLERANCE = 10;
     final int ELEVATOR_UP_POSITION = 1850;
     final int ELEVATOR_DOWN_POSITION = 0;
 
-    BrakingDistanceMotorControler turret =null;
-    BrakingDistanceMotorControler elevator =null;
+    BrakingDistanceMotorController turret =null;
+    BrakingDistanceMotorController elevator =null;
     private DcMotorEx arm =null;
     private Servo claw =null;
     private Servo wrist =null;
@@ -87,6 +87,7 @@ public class PoPRobot {
     double bestTagRating = 0;
     DigitalChannel lowLimitSwitch;
     DigitalChannel highLimitSwitch;
+    private double wristOffsetPosition = 0;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetryIn, LinearOpMode opModeIn) {
         telemetry = telemetryIn;
@@ -104,8 +105,8 @@ public class PoPRobot {
             }
         });
         //turret = hardwareMap.get(DcMotorEx.class, "turret");
-        turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
-        elevator = new BrakingDistanceMotorControler(hardwareMap,"elevator");
+        turret = new BrakingDistanceMotorController(hardwareMap,"turret", 560);
+        elevator = new BrakingDistanceMotorController(hardwareMap,"elevator");
 
         turret.init();
         turret.setAccelerationTicks(32);
@@ -122,6 +123,7 @@ public class PoPRobot {
         highLimitSwitch = hardwareMap.get(DigitalChannel.class, "limit_high");
 
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setTargetPositionTolerance((int)ARM_COUNT_PER_DEGREE);
         elevator.init();
         elevator.setAccelerationTicks(1);
         elevator.setAccelerationStartPower(1);
@@ -174,6 +176,8 @@ public class PoPRobot {
         turret.runToPosition(destination,power);
 
     }
+
+    //returns true if we're not done moving
     public boolean turretTickResult() {
         turret.updateCurrentVelocity();
         return turret.smTick();
@@ -194,6 +198,36 @@ public class PoPRobot {
      //   turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     //}
 
+
+
+
+    public void setWrist (double position, double offset) {
+        wristBasePosition = position;
+        wristOffsetPosition = offset;
+
+        wrist.setPosition(wristBasePosition+wristOffsetPosition);
+    }
+
+    public void setWristBasePosition(double position){
+        wristBasePosition=position;
+        wrist.setPosition(wristBasePosition+wristOffsetPosition);
+    }
+    public void setWristOffset(double offset) {
+        wristOffsetPosition = offset;
+        wrist.setPosition(wristBasePosition+wristOffsetPosition);
+    }
+
+    public double getWristBasePosition() {
+        return wristBasePosition;
+    }
+
+    public double getWristPosition(){
+        return wristBasePosition+wristOffsetPosition;
+    }
+
+    public boolean isArmAtDestination() {
+        return (Math.abs(arm.getCurrentPosition() - arm.getTargetPosition()) < ARM_COUNT_PER_DEGREE);
+    }
     public void turnArmTo (double degrees){
         if (degrees > 250) {
             degrees = 250;
@@ -206,21 +240,12 @@ public class PoPRobot {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(0.8);
     }
-
-
-
-
-    public void setWrist (double position){
-        wristBasePosition=position;
+    public double getArmTargetDegree(){
+        return (arm.getTargetPosition()/ARM_COUNT_PER_DEGREE);
     }
-    public void setWristOffset(double offset) {
-        wrist.setPosition(wristBasePosition+offset);
+    public double getArmDegree(){
+        return (arm.getCurrentPosition()/ARM_COUNT_PER_DEGREE);
     }
-
-    public boolean isArmAtDestination() {
-        return (Math.abs(arm.getCurrentPosition() - arm.getTargetPosition()) < ARM_COUNT_PER_DEGREE);
-    }
-
     public void clawGrab(){
         claw.setPosition(CLAW_CLOSED);
     }

@@ -16,7 +16,7 @@ less messy way, but I'm me and this is how I code.  -Eric
 
  */
 
-public class BrakingDistanceMotorControler {
+public class BrakingDistanceMotorController {
     static final float NANOSECONDS_PER_SECOND = 1000000000;
     static final double LOOK_AHEAD_TIME = 0.075;
     static final double FINE_POWER_SCALE =  0.0002;
@@ -73,27 +73,27 @@ public class BrakingDistanceMotorControler {
     ArrayList<Integer> positionList = new ArrayList<>();
     ArrayList<Long> timeList = new ArrayList<>();
 
-    public BrakingDistanceMotorControler(DcMotorEx setMotor) {
+    public BrakingDistanceMotorController(DcMotorEx setMotor) {
         motor = setMotor;
         init();
     }
-    public BrakingDistanceMotorControler(DcMotorEx motorIn, double maxSpeedIn) {
+    public BrakingDistanceMotorController(DcMotorEx motorIn, double maxSpeedIn) {
         this(motorIn);
         maxSpeed = maxSpeedIn;
     }
 
-    public BrakingDistanceMotorControler(HardwareMap hardwareMap, String motorString) {
+    public BrakingDistanceMotorController(HardwareMap hardwareMap, String motorString) {
         this(hardwareMap.get(DcMotorEx.class, motorString));
         MotorConfigurationType motorType = motor.getMotorType();
         maxSpeed = motorType.getMaxRPM();
     }
 
-    public BrakingDistanceMotorControler(HardwareMap hardwareMap, String motorString, DcMotor.Direction direction)  {
+    public BrakingDistanceMotorController(HardwareMap hardwareMap, String motorString, DcMotor.Direction direction)  {
         this(hardwareMap, motorString);
         setDirection(direction);
     }
 
-    public BrakingDistanceMotorControler(HardwareMap hardwareMap, String motorString, double maxSpeedIn) {
+    public BrakingDistanceMotorController(HardwareMap hardwareMap, String motorString, double maxSpeedIn) {
         this(hardwareMap.get(DcMotorEx.class, motorString));
         maxSpeed = maxSpeedIn;
     }

@@ -38,14 +38,14 @@ import static org.firstinspires.ftc.teamcode.ButtonPressDetector.Button;
 
 public class PoPBDMCTest extends LinearOpMode  {
     private static final int TURRET_COUNT_PER_DEGREE = 135;
-    BrakingDistanceMotorControler turret = null;
+    BrakingDistanceMotorController turret = null;
 
     @Override
     public void runOpMode() {
         //builtin encoder
         //turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
         //through bore encoder
-        turret = new BrakingDistanceMotorControler(hardwareMap,"turret", 560);
+        turret = new BrakingDistanceMotorController(hardwareMap,"turret", 560);
         waitForStart();
         turret.motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setLabel("turret");
