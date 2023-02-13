@@ -31,12 +31,13 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.ButtonPressDetector.Button;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name="Button Test", group ="TeleOp")
-
+@Disabled
 public class ButtonPressTest extends LinearOpMode  {
     private static final int TURRET_COUNT_PER_DEGREE = 135;
 

@@ -91,7 +91,7 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
         telemetry.addData("Path", path);
         telemetry.update();
         System.out.printf("Sleeve %d   Path %d\n" , sleeveCode , path);
-        mecanumDrive.forward(24,0.5);
+        mecanumDrive.forward(26,0.5);
         if (path == 1) {
             mecanumDrive.leftTurn(90,0.5);
             mecanumDrive.forward(24,0.5);

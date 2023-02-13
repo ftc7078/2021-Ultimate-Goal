@@ -33,7 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-@Autonomous(name="Test PoPAuto", group ="Autonomous")
+@Autonomous(name = "PoPAutoWithScoring", group = "Autonomous")
 
 public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
@@ -43,17 +43,19 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
     private PoPRobot robot = new PoPRobot();
     private int sleeveCode;
+
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
-    private enum ScoringDirection {SCORE_LEFT, SCORE_RIGHT};
+    private enum ScoringDirection {SCORE_LEFT, SCORE_RIGHT}
+
+    ;
     private ScoringDirection scoringDirection = ScoringDirection.SCORE_LEFT;
     private int path = 0;
 
 
-
-
-    @Override public void runOpMode() {
+    @Override
+    public void runOpMode() {
 
         robot.init(hardwareMap, telemetry, this);
         mecanumDrive.init(hardwareMap, telemetry, this);
@@ -78,34 +80,77 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
         }
         waitForStart();
         robot.stopVision();
-        robot.setWristBasePosition(sleeveCode / 5);
         if (sleeveCode > 3) {
-            path = sleeveCode -3;
+            scoringDirection = ScoringDirection.SCORE_RIGHT;
+            path = sleeveCode - 3;
         } else {
+            scoringDirection = ScoringDirection.SCORE_LEFT;
             path = sleeveCode;
         }
         telemetry.addData("Sleeve", sleeveCode);
-
         telemetry.addData("Path", path);
         telemetry.update();
-        robot.setWristBasePosition(path/6);
-        robot.setWristOffset(0);
-        sleep(10000);
+        System.out.printf("Sleeve %d   Path %d\n", sleeveCode, path);
+        if (scoringDirection == ScoringDirection.SCORE_LEFT) {
+            robot.turnTurretTo(-90, 1);
+        } else {
+            robot.turnTurretTo(90, 1);
+        }
+        robot.turnArmTo(90);
+        mecanumDrive.forward(12, 0.5);
+        robot.clawRelease();
+        sleep(500);
+        robot.turnTurretTo(0, 1);
+        mecanumDrive.forward(12, 0.5);
+        if (path == 1) {
+            mecanumDrive.leftTurn(90, 0.5);
+            mecanumDrive.forward(24, 0.5);
+        } else if (path == 3) {
+            mecanumDrive.rightTurn(90, 0.5);
+            mecanumDrive.forward(24, 0.5);
+        }
+
+        while (opModeIsActive()) {
+            double speed = 1;
+
+            speed = (gamepad1.right_trigger * 0.5) + 0.5;
+            double fwd = addDeadZone(gamepad1.left_stick_y);
+            double strafe = addDeadZone(gamepad1.left_stick_x);
+            double rot = addDeadZone(gamepad1.right_stick_x);
+
+            fwd = fwd * speed;
+            strafe = strafe * speed * 1.6;
+            if (strafe > 1) {
+                strafe = 1;
+            } else if (strafe < -1) {
+                strafe = -1;
+            }
+            rot = rot * speed;
+            mecanumDrive.setMotors(strafe, fwd, rot, 1);
+        }
+        mecanumDrive.tickSleep();
     }
 
     public void tickCallback() {
+        return;
+    }
+
+    public void tickCallbackDebug() {
         if (gamepad1.b) {
             mecanumDrive.debugMode = true;
         } else if (gamepad1.x) {
             mecanumDrive.debugMode = false;
         }
-        telemetry.addData("debugMode", mecanumDrive.debugMode );
+        telemetry.addData("debugMode", mecanumDrive.debugMode);
         telemetry.update();
+        robot.turretTickResult();
     }
 
     double addDeadZone(double input) {
-        if (Math.abs(input) < 0.1) {return(0.0);}
-        return(input);
+        if (Math.abs(input) < 0.1) {
+            return (0.0);
+        }
+        return (input);
     }
 
 }

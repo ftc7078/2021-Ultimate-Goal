@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,6 +17,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
  */
 
 @Autonomous(name="Concept: Change PIDF", group = "Concept")
+@Disabled
 public class ConceptChangePIDF extends LinearOpMode {
 
     // our DC motor
