@@ -33,9 +33,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-@Autonomous(name = "PoPAutoWithScoring", group = "Autonomous")
+@Autonomous(name = "ElevatorTest", group = "Autonomous")
 
-public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
+public class ElevatorTest extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -72,7 +72,6 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-        
         while (!isStarted() ) {
             sleep(50);
             sleeveCode = robot.getSleevePosition();
@@ -90,60 +89,21 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
             telemetry.update();
         }
         waitForStart();
-        robot.stopVision();
-        robot.clawGrab();
-        telemetry.addData("Sleeve", sleeveCode);
-        telemetry.addData("Path", path);
-        telemetry.update();
-        System.out.printf("Sleeve %d   Path %d\n", sleeveCode, path);
-        mecanumDrive.rightStrafe(4,1);
-        if (scoringDirection == ScoringDirection.SCORE_LEFT) {
-            robot.turnTurretTo(36, 1);
-        } else {
-            robot.turnTurret(-35, 1);
+        robot.setElevatorPosition(3200);
+        while (robot.elevatorTickResult() && opModeIsActive()) {
+            telemetry.addData("ElevatorPosition", robot.getElevatorPosition());
+            telemetry.addData("Elevator Power", robot.elevator.motor.getPower());
+            telemetry.addData("Elevator Loop", "running");
+
+            telemetry.update();
+            sleep(50);
         }
-        //robot.setElevatorPosition(3200);
-        robot.turnArmTo(120);
-        robot.setWrist(0.6, 0);
-
-        mecanumDrive.forward(16, 0.5);
-        waitForElevatorAndTurret();
-        mecanumDrive.debugMode = true;
-        robot.turnArmTo(150);
-        sleep(500);
-        robot.clawRelease();
-        sleep(500);
-        robot.turnArmTo(75);
-        robot.turnTurretTo(0, 1);
-        robot.setElevatorPosition(0);
-        mecanumDrive.forward(28, 0.5);
-        waitForElevatorAndTurret();
-
-        if (path == 1) {
-            mecanumDrive.leftTurn(90, 0.5);
-            mecanumDrive.forward(24, 0.5);
-        } else if (path == 3) {
-            mecanumDrive.rightTurn(90, 0.5);
-            mecanumDrive.forward(24, 0.5);
-        }
-
         while (opModeIsActive()) {
-            double speed = 1;
-
-            speed = (gamepad1.right_trigger * 0.5) + 0.5;
-            double fwd = addDeadZone(gamepad1.left_stick_y);
-            double strafe = addDeadZone(gamepad1.left_stick_x);
-            double rot = addDeadZone(gamepad1.right_stick_x);
-
-            fwd = fwd * speed;
-            strafe = strafe * speed * 1.6;
-            if (strafe > 1) {
-                strafe = 1;
-            } else if (strafe < -1) {
-                strafe = -1;
-            }
-            rot = rot * speed;
-            mecanumDrive.setMotors(strafe, fwd, rot, 1);
+            telemetry.addData("ElevatorPosition", robot.getElevatorPosition());
+            telemetry.addData("Elevator Power", robot.elevator.motor.getPower());
+            telemetry.addData("Elevator Loop", "Done");
+            telemetry.update();
+            sleep(50);
         }
 
     }

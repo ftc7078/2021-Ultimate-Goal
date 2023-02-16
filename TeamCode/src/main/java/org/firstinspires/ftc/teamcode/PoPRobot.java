@@ -71,8 +71,8 @@ public class PoPRobot {
     final int TURRET_COUNT_PER_DEGREE = 4;
     final int TURN_LIMIT = TURRET_COUNT_PER_DEGREE * 180;
     final double ARM_COUNT_PER_DEGREE = 4000 / 360;
-    final double CLAW_CLOSED = 0;
-    final double CLAW_OPEN = 1;
+    final double CLAW_CLOSED = 1;
+    final double CLAW_OPEN = 0;
     final int ELEVATOR_TOLERANCE = 10;
     final int ELEVATOR_UP_POSITION = 1850;
     final int ELEVATOR_DOWN_POSITION = 0;
@@ -107,6 +107,8 @@ public class PoPRobot {
         //turret = hardwareMap.get(DcMotorEx.class, "turret");
         turret = new BrakingDistanceMotorController(hardwareMap,"turret", 560);
         elevator = new BrakingDistanceMotorController(hardwareMap,"elevator");
+        turret.setLabel("Turret");
+        elevator.setLabel("Elevator");
 
         turret.init();
         turret.setAccelerationTicks(32);
@@ -270,6 +272,7 @@ public class PoPRobot {
     }
 
 
+
     public void setElevatorPowerWithLimitSwitches(double power) {
         if (!highLimitSwitch.getState() && power > 0) {
             power = 0;
@@ -287,14 +290,17 @@ public class PoPRobot {
     }
 
 
+
     //returns true if we're not done moving
     public boolean elevatorTickResult() {
-        if ( !highLimitSwitch.getState() || !lowLimitSwitch.getState() ) {
+        if (!highLimitSwitch.getState() && elevator.getPower() > 0) {
             elevator.stop();
             return false;
-        } else{
-            return elevator.smTick();
+        } else if (!lowLimitSwitch.getState() && elevator.getPower() < 0) {
+            elevator.stop();
+            return false;
         }
+        return elevator.smTick();
     }
 
     public void stopVision() {

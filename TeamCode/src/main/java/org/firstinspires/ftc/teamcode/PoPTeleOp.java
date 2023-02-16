@@ -154,7 +154,7 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
                         //robot.turretFreeMoveMode();
                     }
                 } else {
-                    robot.setTurretPower(gamepad2.left_stick_x / 1.5);
+                    robot.setTurretPower(-gamepad2.left_stick_x / 1.5);
                 }
 
                 if (gamepad2.left_trigger > 0.3) {
@@ -227,7 +227,8 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
 
     public void standardMecanumControls() {
         double speed = 1;
-        speed = 1 - (gamepad1.right_trigger * 0.5) + 0.5;
+        //speed = 1 - (gamepad1.right_trigger * 0.5) + 0.5;
+        speed = (gamepad1.right_trigger * 0.5) + 0.5;
         double fwd = addDeadZone(gamepad1.left_stick_y) * speed;
 
         double rot = addDeadZone(gamepad1.right_stick_x) * speed;
