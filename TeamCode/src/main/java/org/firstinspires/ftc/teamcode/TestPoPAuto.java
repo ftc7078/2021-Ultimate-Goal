@@ -59,7 +59,7 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
         robot.init(hardwareMap, telemetry, this);
         mecanumDrive.init(hardwareMap, telemetry, this);
-        mecanumDrive.setCountPerDegree(7);
+        mecanumDrive.setCountPerDegree(7.5);
 
         robot.setMotorDirections(mecanumDrive);
         mecanumDrive.setupTickCallback(this);
@@ -108,20 +108,19 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
         mecanumDrive.forward(16, 0.5);
         waitForElevatorAndTurret();
-        mecanumDrive.debugMode = true;
         robot.turnArmTo(150);
         sleep(500);
         robot.clawRelease();
         sleep(500);
-        robot.turnArmTo(75);
+        robot.turnArmTo(0);
         robot.turnTurretTo(0, 1);
-        robot.setElevatorPosition(0);
-        mecanumDrive.forward(28, 0.5);
+       //robot.setElevatorPosition(0);
+        mecanumDrive.forward(10, 0.5);
         waitForElevatorAndTurret();
 
         if (path == 1) {
             mecanumDrive.leftTurn(90, 0.5);
-            mecanumDrive.forward(24, 0.5);
+            mecanumDrive.forward(20, 0.5);
         } else if (path == 3) {
             mecanumDrive.rightTurn(90, 0.5);
             mecanumDrive.forward(24, 0.5);
