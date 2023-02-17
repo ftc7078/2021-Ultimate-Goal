@@ -33,9 +33,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-@Autonomous(name = "PoPAutoWithScoring", group = "Autonomous")
+@Autonomous(name = "PoPAuto Multi Cone", group = "Autonomous")
 
-public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
+public class PoPAutoMultiCone extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -72,8 +72,9 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-        
-        while (!isStarted() ) {
+        long start = System.currentTimeMillis();
+        boolean timesUp=false;
+        while (!isStarted() ||  (sleeveCode<1 && !timesUp)) {
             sleep(50);
             sleeveCode = robot.getSleevePosition();
             if (sleeveCode > 3) {
@@ -88,6 +89,7 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
 
             telemetry.addData("Scoring Direction", scoringDirection);
             telemetry.update();
+            timesUp = (System.currentTimeMillis() - start) > 4000;
         }
         waitForStart();
         robot.stopVision();
@@ -126,24 +128,7 @@ public class TestPoPAuto extends LinearOpMode implements MecanumDrive.TickCallba
             mecanumDrive.forward(24, 0.5);
         }
 
-        while (opModeIsActive()) {
-            double speed = 1;
 
-            speed = (gamepad1.right_trigger * 0.5) + 0.5;
-            double fwd = addDeadZone(gamepad1.left_stick_y);
-            double strafe = addDeadZone(gamepad1.left_stick_x);
-            double rot = addDeadZone(gamepad1.right_stick_x);
-
-            fwd = fwd * speed;
-            strafe = strafe * speed * 1.6;
-            if (strafe > 1) {
-                strafe = 1;
-            } else if (strafe < -1) {
-                strafe = -1;
-            }
-            rot = rot * speed;
-            mecanumDrive.setMotors(strafe, fwd, rot, 1);
-        }
 
     }
 

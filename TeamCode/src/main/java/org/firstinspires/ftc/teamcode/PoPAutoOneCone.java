@@ -31,13 +31,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 
-@Autonomous(name="PoPAuto Park", group ="Autonomous")
+@Autonomous(name = "PoPAuto One Cone", group = "Autonomous")
 
-public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
+public class PoPAutoOneCone extends LinearOpMode implements MecanumDrive.TickCallback {
 
 
     private MecanumDrive mecanumDrive = new MecanumDrive();
@@ -45,21 +43,23 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
     private PoPRobot robot = new PoPRobot();
     private int sleeveCode;
+
     //This is Object Detection (OD)
     //private UGObjectDetector OD = new UGObjectDetector();
     //private int DWAS = 2;//Duck Wheel Acceleration Speed
-    private enum ScoringDirection {SCORE_LEFT, SCORE_RIGHT};
+    private enum ScoringDirection {SCORE_LEFT, SCORE_RIGHT}
+
+    ;
     private ScoringDirection scoringDirection = ScoringDirection.SCORE_LEFT;
     private int path = 0;
 
 
-
-
-    @Override public void runOpMode() {
+    @Override
+    public void runOpMode() {
 
         robot.init(hardwareMap, telemetry, this);
         mecanumDrive.init(hardwareMap, telemetry, this);
-        mecanumDrive.setCountPerDegree(7);
+        mecanumDrive.setCountPerDegree(7.5);
 
         robot.setMotorDirections(mecanumDrive);
         mecanumDrive.setupTickCallback(this);
@@ -72,30 +72,60 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-        while (!isStarted() ) {
+        long start = System.currentTimeMillis();
+        boolean timesUp=false;
+        while (!isStarted() ||  (sleeveCode<1 && !timesUp)) {
             sleep(50);
             sleeveCode = robot.getSleevePosition();
+            if (sleeveCode > 3) {
+                scoringDirection = ScoringDirection.SCORE_RIGHT;
+                path = sleeveCode - 3;
+            } else {
+                scoringDirection = ScoringDirection.SCORE_LEFT;
+                path = sleeveCode;
+            }
             telemetry.addData("Sleeve", sleeveCode);
+            telemetry.addData("path", path);
+
+            telemetry.addData("Scoring Direction", scoringDirection);
             telemetry.update();
+            timesUp = (System.currentTimeMillis() - start) > 4000;
         }
         waitForStart();
         robot.stopVision();
-        if (sleeveCode > 3) {
-            scoringDirection = ScoringDirection.SCORE_RIGHT;
-            path = sleeveCode -3;
-        } else {
-            scoringDirection = ScoringDirection.SCORE_LEFT;
-            path = sleeveCode;
-        }
+        robot.clawGrab();
         telemetry.addData("Sleeve", sleeveCode);
         telemetry.addData("Path", path);
         telemetry.update();
-        System.out.printf("Sleeve %d   Path %d\n" , sleeveCode , path);
-        mecanumDrive.forward(26,0.5);
+        System.out.printf("Sleeve %d   Path %d\n", sleeveCode, path);
+
+        if (scoringDirection == ScoringDirection.SCORE_LEFT) {
+            mecanumDrive.leftStrafe(4,1);
+            robot.turnTurretTo(32, 1);
+        } else {
+            mecanumDrive.rightStrafe(4,1);
+            robot.turnTurret(-35, 1);
+        }
+        //robot.setElevatorPosition(3200);
+        robot.turnArmTo(120);
+        robot.setWrist(0.6, 0);
+
+        mecanumDrive.forward(16, 0.5);
+        waitForElevatorAndTurret();
+        robot.turnArmTo(150);
+        sleep(500);
+        robot.clawRelease();
+        sleep(500);
+        robot.turnArmTo(0);
+        robot.turnTurretTo(0, 1);
+       //robot.setElevatorPosition(0);
+        mecanumDrive.forward(10, 0.5);
+        waitForElevatorAndTurret();
+
         if (path == 1) {
-            mecanumDrive.leftTurn(90,0.5);
-            mecanumDrive.forward(24,0.5);
-        } else if (path == 3){
+            mecanumDrive.leftTurn(90, 0.5);
+            mecanumDrive.forward(20, 0.5);
+        } else if (path == 3) {
             mecanumDrive.rightTurn(90, 0.5);
             mecanumDrive.forward(24, 0.5);
         }
@@ -106,37 +136,46 @@ public class PoPAuto extends LinearOpMode implements MecanumDrive.TickCallback {
             speed = (gamepad1.right_trigger * 0.5) + 0.5;
             double fwd = addDeadZone(gamepad1.left_stick_y);
             double strafe = addDeadZone(gamepad1.left_stick_x);
-            double rot= addDeadZone(gamepad1.right_stick_x);
+            double rot = addDeadZone(gamepad1.right_stick_x);
 
             fwd = fwd * speed;
-            strafe =strafe * speed * 1.6;
+            strafe = strafe * speed * 1.6;
             if (strafe > 1) {
                 strafe = 1;
             } else if (strafe < -1) {
                 strafe = -1;
             }
             rot = rot * speed;
-            mecanumDrive.setMotors(strafe,fwd,rot, 1);
+            mecanumDrive.setMotors(strafe, fwd, rot, 1);
         }
-        mecanumDrive.tickSleep();
+
     }
 
-    public void tickCallback() {
-        return;
+    public void waitForElevatorAndTurret() {
+        while (robot.turretTickResult() || robot.elevatorTickResult()) {
+            if (!opModeIsActive()) {
+                return;
+            }
+            sleep(50);
+        }
     }
-    public void tickCallbackDebug() {
+    public void tickCallback() {
         if (gamepad1.b) {
             mecanumDrive.debugMode = true;
         } else if (gamepad1.x) {
             mecanumDrive.debugMode = false;
         }
-        telemetry.addData("debugMode", mecanumDrive.debugMode );
+        telemetry.addData("debugMode", mecanumDrive.debugMode);
         telemetry.update();
+        robot.turretTickResult();
+        robot.elevatorTickResult();
     }
 
     double addDeadZone(double input) {
-        if (Math.abs(input) < 0.1) {return(0.0);}
-        return(input);
+        if (Math.abs(input) < 0.1) {
+            return (0.0);
+        }
+        return (input);
     }
 
 }
