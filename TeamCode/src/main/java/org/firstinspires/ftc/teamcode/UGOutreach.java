@@ -2,7 +2,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,8 +12,6 @@ import static org.firstinspires.ftc.teamcode.UGRobotOutreach.shooterDirection;
 
 
 @TeleOp(name="Ring Shooter", group="Outreach")
-@Disabled
-
 
 public class UGOutreach extends LinearOpMode {
 
@@ -36,6 +33,8 @@ public class UGOutreach extends LinearOpMode {
     @Override
     public void runOpMode() {
         mecanumDrive.init(hardwareMap, telemetry, this);
+        robot.setMotorDirections(mecanumDrive);
+
         robot.init(hardwareMap,telemetry,this);
 
 

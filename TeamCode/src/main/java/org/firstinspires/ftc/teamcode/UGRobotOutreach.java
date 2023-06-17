@@ -2,6 +2,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -81,7 +83,10 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
 
 
     }
+    public void setMotorDirections (MecanumDrive mecanumDrive) {
+        mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
 
+    }
     public void tick () {
         long now = System.nanoTime();
         Long entry = null;
