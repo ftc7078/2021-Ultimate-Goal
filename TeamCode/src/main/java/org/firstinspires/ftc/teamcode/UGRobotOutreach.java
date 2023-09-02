@@ -6,7 +6,6 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -26,11 +25,14 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     private DcMotor pickupbottom = null;
     private DcMotor pickuptop = null;
     private DcMotor pickup = null;
-    FlywheelMC flyWheel = null;
+    FlywheelMC flywheel = null;
     private Servo launchServo;
     public pickupDirection pickupState;
     public shooterDirection shooterState;
     private double flywheelPower = 0.72;
+    private boolean flywheelOn = false;
+    private int spinUpDelay = 3000;
+
     private int upWobble = 1080;
     private int downWobble = 0;
     private int midWobble = 370;
@@ -57,19 +59,19 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
         pickupbottom = hardwareMap.get(DcMotor.class, "pickupBottom");
         pickuptop = hardwareMap.get(DcMotor.class, "pickupTop");
 
-        flyWheel = new FlywheelMC(hardwareMap,"shooter",600000);
+        flywheel = new FlywheelMC(hardwareMap,"shooter",600000);
 
-        flyWheel.setDirection(DcMotor.Direction.REVERSE);
-        flyWheel.setBackwardsEncoder(true);
+        flywheel.setDirection(DcMotor.Direction.REVERSE);
+        flywheel.setBackwardsEncoder(true);
 
-        flyWheel.setHistorySize(3);
+        flywheel.setHistorySize(3);
 
         pickupbottom.setPower(0);
         pickuptop.setPower(0);
         setFlywheel(shooterDirection.OUT);
-        flyWheel.setPowerManual(flywheelPower);
-        flyWheel.setPowerScale(150/100000000.0);
-        flyWheel.setLookAheadTime(.35);
+        flywheel.setPowerManual(flywheelPower);
+        flywheel.setPowerScale(150/100000000.0);
+        flywheel.setLookAheadTime(.35);
         setLaunchServo(false);
 
 
@@ -89,17 +91,25 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     }
     public void tick () {
         long now = System.nanoTime();
-        Long entry = null;
-        for (Long when : toggleQueue) {
-            if (now>when){
-                entry = when;
+        if (flywheelOn) {
+            Long entry = null;
+            for (Long when : toggleQueue) {
+                if (now > when) {
+                    entry = when;
+                }
             }
+            if (entry != null) {
+                setLaunchServo(!launchServoState);
+                toggleQueue.remove(entry);
+            }
+            flywheel.setPowerAuto(flywheelPower);
+            if (toggleQueue.isEmpty()) {
+                flywheelOn = false;
+            }
+        } else {
+            flywheel.updateCurrentVelocity();
+            flywheel.setPowerManual(0);
         }
-        if (entry != null) {
-            setLaunchServo(!launchServoState);
-            toggleQueue.remove(entry);
-        }
-        flyWheel.setPowerAuto(flywheelPower);
     }
 
     public void tickCallback() {
@@ -108,17 +118,23 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
 
 
 
+    public void shoot () {
+        clearQueue();
+        setFlywheel(UGRobotOutreach.shooterDirection.OUT);
+        flywheelOn = true;
+        addQueue(spinUpDelay);
+        addQueue(spinUpDelay+200);
+    }
 
 
     public void multiShoot (){
         clearQueue();
-        setFlywheel(UGRobotOutreach.shooterDirection.OUT);
-        setLaunchServo(true);
-        for (int i=1;i<=3;i++) {
-            addQueue(multishotDelay * i);
+        flywheelOn = true;
+        for (int i=0;i<=3;i++) {
+            addQueue((multishotDelay * i) + spinUpDelay);
         }
         for (int i=5;i<=8;i++) {
-            addQueue(multishotDelay * i);
+            addQueue((multishotDelay * i) + spinUpDelay);
         }
 
     }
@@ -140,24 +156,12 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
         toggleQueue.add(System.nanoTime()+(whenMS*1000000));
     }
 
-    public void oldShoot() {
-        setLaunchServo(true);
-        opMode.sleep(200);
-        setLaunchServo(false);
-        opMode.sleep(200);
 
-    }
 
-    public void shoot () {
-        clearQueue();
-        setFlywheel(UGRobotOutreach.shooterDirection.OUT);
-        setLaunchServo(true);
-        addQueue(200);
-    }
 
     public double findShooterSpeed () {
-        flyWheel.updateCurrentVelocity();
-        return (flyWheel.getCurrentVelocity());
+        flywheel.updateCurrentVelocity();
+        return (flywheel.getCurrentVelocity());
     }
 
     public void setPickup(UGRobotOutreach.pickupDirection direction) {
@@ -197,17 +201,17 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     }
 
     public int getShooterEncoderPosition() {
-        return flyWheel.motor.getCurrentPosition();
+        return flywheel.motor.getCurrentPosition();
     }
 
     public void setFlywheel(UGRobotOutreach.shooterDirection direction) {
         shooterState = direction;
         switch (direction) {
             case OUT:
-                flyWheel.setPowerAuto(flywheelPower);
+                flywheel.setPowerAuto(flywheelPower);
                 break;
             case STOP:
-                flyWheel.setPowerManual(0);
+                flywheel.setPowerManual(0);
                 break;
         }
     }

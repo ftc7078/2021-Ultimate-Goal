@@ -123,11 +123,11 @@ public class UGOutreach extends LinearOpMode {
             //telemetry.addData("Left/Right Stick", "LX (%.2f), LY (%.2f), RX (%.2f), RY (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_stick_y);
             telemetry.addData("Shoot Power", robot.getFlywheelPower());
 
-            telemetry.addData("Current Velocity",robot.flyWheel.getCurrentVelocity());
-            telemetry.addData("Desired Velocity", robot.flyWheel.getDesiredVelocity());
-            telemetry.addData("MotorPower",robot.flyWheel.motor.getPower());
-            telemetry.addData("change",robot.flyWheel.change);
-            telemetry.addData("vs",robot.flyWheel.difference);
+            telemetry.addData("Current Velocity",robot.flywheel.getCurrentVelocity());
+            telemetry.addData("Desired Velocity", robot.flywheel.getDesiredVelocity());
+            telemetry.addData("MotorPower",robot.flywheel.motor.getPower());
+            telemetry.addData("change",robot.flywheel.change);
+            telemetry.addData("vs",robot.flywheel.difference);
 
             telemetry.update();
         }
