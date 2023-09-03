@@ -18,6 +18,13 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     private Telemetry telemetry;
     private LinearOpMode opMode;
 
+    private long flywheelSpinUpStart;
+    private long flywheelSpinUpDelayMax = 1500;
+
+    private long shootingStartTime = 0;
+    private boolean shootingStarted = false;
+
+    private long shooterSpinDownDelay = 1500;
 
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
@@ -31,7 +38,6 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     public shooterDirection shooterState;
     private double flywheelPower = 0.72;
     private boolean flywheelOn = false;
-    private int spinUpDelay = 3000;
 
     private int upWobble = 1080;
     private int downWobble = 0;
@@ -41,7 +47,7 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     private double wobblePower = 0.75;
     private ArrayList<Long> toggleQueue = new ArrayList<Long>();
     private boolean launchServoState;
-    int multishotDelay = 100;
+    long multishotDelay = 100;
 
     enum pickupDirection {IN, OUT, STOP}
     enum shooterDirection {OUT, STOP}
@@ -89,23 +95,44 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
         mecanumDrive.setMotorDirections(FORWARD, REVERSE, FORWARD, REVERSE);
 
     }
+
+    boolean shooterAtSpeed() {
+        if (!flywheelOn) return false;
+        if (System.currentTimeMillis() > flywheelSpinUpStart + flywheelSpinUpDelayMax) {
+            return true;
+        } else if (flywheel.getCurrentVelocity() > (flywheel.getDesiredVelocity() - 100)) {
+            return true;
+        }
+        return false;
+    }
+
     public void tick () {
-        long now = System.nanoTime();
+        long now = System.currentTimeMillis();
+        if (shootingStarted) {
+            if (now > (shootingStartTime + shooterSpinDownDelay) ) {
+                flywheelOn = false;
+                shootingStarted = false;
+            }
+        }
         if (flywheelOn) {
-            Long entry = null;
-            for (Long when : toggleQueue) {
-                if (now > when) {
-                    entry = when;
+            flywheel.setPowerAuto(flywheelPower);
+            if (shooterAtSpeed()) {
+                if (!shootingStarted) {
+                    shootingStarted = true;
+                    shootingStartTime = now;
+                }
+                Long entry = null;
+                for (Long when : toggleQueue) {
+                    if ( (now-shootingStartTime) >= when ) {
+                        entry = when;
+                    }
+                }
+                if (entry != null) {
+                    setLaunchServo(!launchServoState);
+                    toggleQueue.remove(entry);
                 }
             }
-            if (entry != null) {
-                setLaunchServo(!launchServoState);
-                toggleQueue.remove(entry);
-            }
-            flywheel.setPowerAuto(flywheelPower);
-            if (toggleQueue.isEmpty()) {
-                flywheelOn = false;
-            }
+
         } else {
             flywheel.updateCurrentVelocity();
             flywheel.setPowerManual(0);
@@ -116,47 +143,36 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
         tick();
     }
 
+    public void startShooting() {
+        toggleQueue.clear();
+        flywheelOn = true;
+        if (shootingStarted) {
+            shootingStartTime = System.currentTimeMillis();
+        }
+    }
 
 
     public void shoot () {
-        clearQueue();
-        setFlywheel(UGRobotOutreach.shooterDirection.OUT);
-        flywheelOn = true;
-        addQueue(spinUpDelay);
-        addQueue(spinUpDelay+200);
+        startShooting();
+        addQueue(0);
+        addQueue(200);
     }
 
 
     public void multiShoot (){
-        clearQueue();
-        flywheelOn = true;
+        startShooting();
         for (int i=0;i<=3;i++) {
-            addQueue((multishotDelay * i) + spinUpDelay);
+            addQueue(multishotDelay * i );
         }
         for (int i=5;i<=8;i++) {
-            addQueue((multishotDelay * i) + spinUpDelay);
+            addQueue(multishotDelay * i);
         }
 
     }
 
-    //public void addWobble(UGRobot.wobbleDirection direction) {
-        //wobbleState = direction;
-        //case UP:
-    //}
-
-    public void clearQueue (){
-        toggleQueue.clear();
+    public void addQueue (long whenMS) {
+        toggleQueue.add(whenMS);
     }
-
-    public boolean notDoneShooting() {
-        return !toggleQueue.isEmpty();
-    }
-
-    public void addQueue (int whenMS) {
-        toggleQueue.add(System.nanoTime()+(whenMS*1000000));
-    }
-
-
 
 
     public double findShooterSpeed () {
