@@ -17,14 +17,14 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
 
     private Telemetry telemetry;
     private LinearOpMode opMode;
+    private long flywheelSpinUpStart = 0;
 
-    private long flywheelSpinUpStart;
     private long flywheelSpinUpDelayMax = 1500;
 
     private long shootingStartTime = 0;
     private boolean shootingStarted = false;
 
-    private long shooterSpinDownDelay = 1500;
+    private long shooterSpinDownDelay = 3000;
 
 
     enum MoveDirection {FORWARD, BACKWARD, LEFT, RIGHT}
@@ -67,7 +67,7 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
 
         flywheel = new FlywheelMC(hardwareMap,"shooter",600000);
 
-        flywheel.setDirection(DcMotor.Direction.REVERSE);
+        flywheel.setDirection(DcMotor.Direction.FORWARD);
         flywheel.setBackwardsEncoder(true);
 
         flywheel.setHistorySize(3);
@@ -99,8 +99,10 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
     boolean shooterAtSpeed() {
         if (!flywheelOn) return false;
         if (System.currentTimeMillis() > flywheelSpinUpStart + flywheelSpinUpDelayMax) {
+            System.out.println("Spinup max time exceeded.  Returning true:" + flywheelSpinUpDelayMax + " + " + flywheelSpinUpDelayMax);
             return true;
         } else if (flywheel.getCurrentVelocity() > (flywheel.getDesiredVelocity() - 100)) {
+            System.out.println("Spinup done.  RPM is now" + flywheel.getCurrentVelocity() + "of desired" + flywheel.getDesiredVelocity());
             return true;
         }
         return false;
@@ -116,11 +118,13 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
         }
         if (flywheelOn) {
             flywheel.setPowerAuto(flywheelPower);
-            if (shooterAtSpeed()) {
-                if (!shootingStarted) {
+            if (!shootingStarted) {
+                if (shooterAtSpeed()) {
                     shootingStarted = true;
                     shootingStartTime = now;
                 }
+            }
+            if (shootingStarted) {
                 Long entry = null;
                 for (Long when : toggleQueue) {
                     if ( (now-shootingStartTime) >= when ) {
@@ -145,7 +149,10 @@ public class UGRobotOutreach implements MecanumDrive.TickCallback {
 
     public void startShooting() {
         toggleQueue.clear();
+        launchServoState=false;
         flywheelOn = true;
+        flywheelSpinUpStart = System.currentTimeMillis();
+
         if (shootingStarted) {
             shootingStartTime = System.currentTimeMillis();
         }
