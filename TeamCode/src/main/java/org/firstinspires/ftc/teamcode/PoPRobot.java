@@ -239,9 +239,19 @@ public class PoPRobot {
         int destination = (int) (ARM_COUNT_PER_DEGREE * degrees);
         arm.setTargetPositionTolerance((int) ARM_COUNT_PER_DEGREE);
         arm.setTargetPosition(destination);
+        //System.out.println("Setting arm to position"+ destination);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(0.8);
     }
+
+    public void waveTick() {
+        double target_position = Math.sin(System.currentTimeMillis() / 300d);
+        setWrist(1-(target_position*.5+0.5),0);
+        target_position = (target_position * 50) + 140;
+        //System.out.println("Turning arm to position: " + target_position);
+        turnArmTo(target_position);
+    }
+
     public double getArmTargetDegree(){
         return (arm.getTargetPosition()/ARM_COUNT_PER_DEGREE);
     }

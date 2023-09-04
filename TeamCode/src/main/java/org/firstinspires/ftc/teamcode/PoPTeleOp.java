@@ -156,15 +156,23 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
                 } else {
                     robot.setTurretPower(-gamepad2.left_stick_x / 1.5);
                 }
+                if (gamepad2.left_bumper) {
+                    robot.waveTick();
+                    System.out.println("Main wavetick");
+                } else if (gamepad2.back) {
+                    robot.waveTick();
+                    System.out.println("Alternate wavetick");
+                }
+
 
                 if (gamepad2.left_trigger > 0.3) {
                     if (pad2pressDetector.wasPressed(a)) {
                         robot.turnArmTo(robot.getArmTargetDegree() + 10);
                         robot.setWristBasePosition(robot.getWristBasePosition() + 0.03);
                     } else if (gamepad2.x) {
-
+                        robot.setWristBasePosition(robot.getWristBasePosition() + 0.005);
                     } else if (gamepad2.b) {
-
+                        robot.setWristBasePosition(robot.getWristBasePosition() - 0.005);
                     } else if (pad2pressDetector.wasPressed(y)) {
                         robot.turnArmTo(robot.getArmTargetDegree() - 10);
                         robot.setWristBasePosition(robot.getWristBasePosition() - 0.03);
@@ -173,15 +181,15 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
                 } else {
                     if (gamepad2.a) {
                         robot.turnArmTo(250);
-                        robot.setWristBasePosition(0.8);
+                        robot.setWristBasePosition(0.73);
                     } else if (gamepad2.x) {
-                        robot.turnArmTo(200);
-                        robot.setWristBasePosition(0.7);
+                        robot.turnArmTo(220);
+                        robot.setWristBasePosition(0.66);
                     } else if (gamepad2.b) {
                         robot.turnArmTo(145);
-                        robot.setWristBasePosition(0.6);
+                        robot.setWristBasePosition(0.38);
                     } else if (gamepad2.y) {
-                        robot.turnArmTo(75);
+                        robot.turnArmTo(90);
                         robot.setWristBasePosition(0.2);
                     } else if (gamepad2.start) {
                         robot.turnArmTo(5);
@@ -208,8 +216,8 @@ public class PoPTeleOp extends LinearOpMode implements MecanumDrive.TickCallback
                     telemetry.addData("elevator power", "Auto");
                 }
             } else {
-                robot.setElevatorPowerWithLimitSwitches(-gamepad2.right_stick_y);
-                telemetry.addData("elevator power", -gamepad2.right_stick_y);
+                //robot.setElevatorPowerWithLimitSwitches(-gamepad2.right_stick_y);
+                //telemetry.addData("elevator power", -gamepad2.right_stick_y);
             }
 
             standardMecanumControls();
